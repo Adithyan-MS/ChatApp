@@ -1,4 +1,4 @@
-package com.thinkpalm.ChatApplication.Services;
+package com.thinkpalm.ChatApplication.Service;
 
 import com.thinkpalm.ChatApplication.Model.UserInfoDetails;
 import com.thinkpalm.ChatApplication.Model.UserModel;
@@ -13,8 +13,11 @@ import java.util.Optional;
 
 @Component
 public class UserInfoService implements UserDetailsService {
+
     @Autowired
-    private UserRepository urep;
+    private  UserRepository urep;
+
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UserModel> userInfo = urep.findByName(username);

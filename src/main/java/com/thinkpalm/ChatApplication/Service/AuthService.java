@@ -1,4 +1,4 @@
-package com.thinkpalm.ChatApplication.Services;
+package com.thinkpalm.ChatApplication.Service;
 
 import com.thinkpalm.ChatApplication.Model.LoginRequest;
 import com.thinkpalm.ChatApplication.Model.UserModel;
@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,21 +15,22 @@ import java.util.Calendar;
 import java.util.Date;
 
 @Service
-public class UserService {
+public class AuthService {
 
     private final UserRepository urep;
-    @Autowired
-    private PasswordEncoder encoder;
+
+    private final PasswordEncoder encoder;
 
     private final JwtService jwtService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public UserService(UserRepository urep,JwtService jwtService) {
+    public AuthService(UserRepository urep, JwtService jwtService,PasswordEncoder encoder,AuthenticationManager authenticationManager) {
         this.urep = urep;
         this.jwtService = jwtService;
+        this.encoder = encoder;
+        this.authenticationManager = authenticationManager;
     }
 
     public String registerUser(UserModel user){
@@ -43,7 +43,6 @@ public class UserService {
             user.setCreated_at(currentTimestamp);
 
             urep.save(user);
-
             return "success";
         }
         catch (Exception e){
@@ -68,4 +67,6 @@ public class UserService {
 
 
     }
+
+
 }

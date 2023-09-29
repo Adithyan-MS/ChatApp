@@ -2,21 +2,21 @@ package com.thinkpalm.ChatApplication.Controller;
 
 import com.thinkpalm.ChatApplication.Model.LoginRequest;
 import com.thinkpalm.ChatApplication.Model.UserModel;
-import com.thinkpalm.ChatApplication.Services.JwtService;
-import com.thinkpalm.ChatApplication.Services.UserService;
+import com.thinkpalm.ChatApplication.Service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/chatApi/v1/user")
-public class UserController {
+@RequestMapping("/chatApi/v1/auth")
+public class AuthController {
 
-    private final UserService userv;
+    private final AuthService userv;
 
     @Autowired
-    public UserController(UserService userv){
+    public AuthController(AuthService userv){
         this.userv = userv;
     }
 
@@ -38,7 +38,10 @@ public class UserController {
 
     @GetMapping("/hello")
     public String getRe(){
-        return "heyt";
+
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
+
+
 
 }

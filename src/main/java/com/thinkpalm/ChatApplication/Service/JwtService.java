@@ -1,14 +1,12 @@
-package com.thinkpalm.ChatApplication.Services;
+package com.thinkpalm.ChatApplication.Service;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
@@ -51,7 +49,6 @@ public class JwtService {
         final String username=extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-
     public String generateToken(String username){
         Map<String,Object> claims = new HashMap<>();
         return createToken(claims,username);

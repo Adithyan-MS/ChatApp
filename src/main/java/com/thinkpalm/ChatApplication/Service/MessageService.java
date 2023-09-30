@@ -2,6 +2,7 @@ package com.thinkpalm.ChatApplication.Service;
 
 import com.thinkpalm.ChatApplication.Model.MessageModel;
 import com.thinkpalm.ChatApplication.Model.MessageReceiverModel;
+import com.thinkpalm.ChatApplication.Model.MessageRequest;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.MessageReceiverRepository;
 import com.thinkpalm.ChatApplication.Repository.MessageRepository;
@@ -11,10 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class MessageService {
@@ -32,38 +30,36 @@ public class MessageService {
         this.messageReceiverRepository = messageReceiverRepository;
     }
 
-    public String sendPersonalMessage(String receiverName, Map<String,String> msg) {
+    public String sendMessage(MessageRequest msg) {
         try{
             Optional<UserModel> sender = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName());
-            Optional<UserModel> receiver = userRepository.findByName(receiverName);
-            if(sender.isPresent()&& receiver.isPresent()){
-                MessageModel messageModel = new MessageModel();
-                messageModel.setMessage_content(msg.get("message"));
-                messageModel.setSender(sender.get());
+            List receivers = msg.getTo();
+            Optional<List<UserModel>> receiverList = userRepository.findByNames(receivers);
+            if(sender.isPresent()&& receiverList.isPresent()){
 
                 Date currentTime = new Date();
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(currentTime);
                 Timestamp currentTimestamp = new Timestamp(calendar.getTimeInMillis());
-                messageModel.setCreated_at(currentTimestamp);
 
+                MessageModel messageModel = new MessageModel();
+                messageModel.setMessage_content(msg.getMessage());
+                messageModel.setSender(sender.get());
+                messageModel.setCreated_at(currentTimestamp);
                 messageRepository.save(messageModel);
 
-                MessageReceiverModel messageReceiverModel = new MessageReceiverModel();
-                messageReceiverModel.setMessage(messageModel);
-                messageReceiverModel.setReceiver(receiver.get());
-                messageReceiverModel.setReceived_at(currentTimestamp);
-
-                messageReceiverRepository.save(messageReceiverModel);
-
+                for(UserModel user: receiverList.get()){
+                    MessageReceiverModel messageReceiverModel = new MessageReceiverModel();
+                    messageReceiverModel.setMessage(messageModel);
+                    messageReceiverModel.setReceiver(user);
+                    messageReceiverModel.setReceived_at(currentTimestamp);
+                    messageReceiverRepository.save(messageReceiverModel);
+                }
             }
-
-            return "successfull";
+            return "Message send successfull";
         }catch(Exception e){
             return "unsuccessfull";
         }
-
-
 
     }
 }

@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Controller;
 
+import com.thinkpalm.ChatApplication.Model.MessageRequest;
 import com.thinkpalm.ChatApplication.Service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +18,9 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @PostMapping("/sendPersonalMessage/{receiverName}")
-    public String sendPersonalMessage(@PathVariable String receiverName, @RequestBody Map<String,String> msg){
-        return messageService.sendPersonalMessage(receiverName,msg);
+    @PostMapping("/sendMessage")
+    public String sendMessage(@RequestBody MessageRequest msg){
+        return messageService.sendMessage(msg);
     }
 
 }

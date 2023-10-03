@@ -16,7 +16,7 @@ public class MessageModel {
 
     @Column
     @NonNull
-    private String message_content;
+    private String content;
 
     @NonNull
     @ManyToOne(cascade = CascadeType.PERSIST)
@@ -47,12 +47,12 @@ public class MessageModel {
     }
 
     @NonNull
-    public String getMessage_content() {
-        return message_content;
+    public String getContent() {
+        return content;
     }
 
-    public void setMessage_content(@NonNull String message_content) {
-        this.message_content = message_content;
+    public void setContent(@NonNull String content) {
+        this.content = content;
     }
 
     @NonNull

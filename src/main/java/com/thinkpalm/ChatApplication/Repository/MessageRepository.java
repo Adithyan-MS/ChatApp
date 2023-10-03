@@ -8,6 +8,4 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface MessageRepository extends JpaRepository<MessageModel,Integer> {
 
-    @Query(value = "select * from user where name = ?",nativeQuery = true)
-    UserModel findByUsername(String receiverName);
 }

@@ -1,18 +1,15 @@
 package com.thinkpalm.ChatApplication.Service;
 
-import com.thinkpalm.ChatApplication.Model.MessageModel;
-import com.thinkpalm.ChatApplication.Model.MessageReceiverModel;
-import com.thinkpalm.ChatApplication.Model.MessageRequest;
-import com.thinkpalm.ChatApplication.Model.UserModel;
-import com.thinkpalm.ChatApplication.Repository.MessageReceiverRepository;
-import com.thinkpalm.ChatApplication.Repository.MessageRepository;
-import com.thinkpalm.ChatApplication.Repository.UserRepository;
+import com.thinkpalm.ChatApplication.Model.*;
+import com.thinkpalm.ChatApplication.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
+
 
 @Service
 public class MessageService {
@@ -22,44 +19,67 @@ public class MessageService {
     private final MessageRepository messageRepository;
 
     private final MessageReceiverRepository messageReceiverRepository;
+    private final RoomRepository roomRepository;
+    private final MessageRoomRepository messageRoomRepository;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository,UserRepository userRepository,MessageReceiverRepository messageReceiverRepository){
+    public MessageService(MessageRepository messageRepository,UserRepository userRepository,MessageReceiverRepository messageReceiverRepository,RoomRepository roomRepository,MessageRoomRepository messageRoomRepository){
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.messageReceiverRepository = messageReceiverRepository;
+        this.roomRepository = roomRepository;
+        this.messageRoomRepository = messageRoomRepository;
     }
 
-    public String sendMessage(MessageRequest msg) {
-        try{
-            Optional<UserModel> sender = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName());
-            List receivers = msg.getTo();
-            Optional<List<UserModel>> receiverList = userRepository.findByNames(receivers);
-            if(sender.isPresent()&& receiverList.isPresent()){
+    public String sendMessage(MessageSendRequest messageSendRequest){
+        Message message = messageSendRequest.getMessage();
+        Receiver receiver = messageSendRequest.getReceiver();
+        if("user".equals(receiver.getType())){
+            UserModel receiverUser = userRepository.findByName(receiver.getName()).orElse(null);
+            if(receiverUser != null){
+                MessageReceiverModel messageReceiverModel = new MessageReceiverModel();
+                messageReceiverModel.setReceiver(receiverUser);
+                messageReceiverModel.setMessage(saveMessage(message));
+                messageReceiverModel.setReceived_at(Timestamp.valueOf(LocalDateTime.now()));
+                messageReceiverRepository.save(messageReceiverModel);
 
-                Date currentTime = new Date();
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(currentTime);
-                Timestamp currentTimestamp = new Timestamp(calendar.getTimeInMillis());
+                return "message send successfully";
 
-                MessageModel messageModel = new MessageModel();
-                messageModel.setMessage_content(msg.getMessage());
-                messageModel.setSender(sender.get());
-                messageModel.setCreated_at(currentTimestamp);
-                messageRepository.save(messageModel);
-
-                for(UserModel user: receiverList.get()){
-                    MessageReceiverModel messageReceiverModel = new MessageReceiverModel();
-                    messageReceiverModel.setMessage(messageModel);
-                    messageReceiverModel.setReceiver(user);
-                    messageReceiverModel.setReceived_at(currentTimestamp);
-                    messageReceiverRepository.save(messageReceiverModel);
-                }
+            }else{
+                return "receiver not found!";
             }
-            return "Message send successfull";
-        }catch(Exception e){
-            return "unsuccessfull";
         }
+        else if("room".equals(receiver.getType())){
+            RoomModel receiverRoom = roomRepository.findByName(receiver.getName());
+            if(receiverRoom != null){
+                MessageRoomModel messageRoomModel = new MessageRoomModel();
+                messageRoomModel.setRoom(receiverRoom);
+                messageRoomModel.setMessage(saveMessage(message));
+                messageRoomModel.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+                messageRoomRepository.save(messageRoomModel);
 
+                return "message send successfully";
+
+            }else{
+                return "room not found!";
+            }
+        }else{
+            return "invalid receiverType!";
+        }
+    }
+    public MessageModel saveMessage(Message message){
+        Optional<UserModel> sender = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName());
+        MessageModel messageModel = new MessageModel();
+        messageModel.setContent(message.getContent());
+        messageModel.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+        messageModel.setSender(sender.get());
+        if(message.getParentMessage() != null){
+            MessageModel parentMessage = messageRepository.findById(message.getParentMessage()).orElse(null);
+            if(parentMessage != null){
+                messageModel.setParent_message(parentMessage);
+            }
+        }
+        messageRepository.save(messageModel);
+        return messageModel;
     }
 }

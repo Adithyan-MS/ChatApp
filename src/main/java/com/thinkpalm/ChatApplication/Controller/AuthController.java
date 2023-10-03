@@ -38,7 +38,6 @@ public class AuthController {
 
     @GetMapping("/hello")
     public String getRe(){
-
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 

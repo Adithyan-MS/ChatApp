@@ -12,6 +12,4 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserModel,Integer> {
     Optional<UserModel> findByName(String username);
 
-    @Query("SELECT u FROM UserModel u WHERE u.name IN :names")
-    Optional<List<UserModel>> findByNames(@Param("names") List<String> receivers);
 }

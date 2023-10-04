@@ -82,4 +82,26 @@ public class MessageService {
         messageRepository.save(messageModel);
         return messageModel;
     }
+
+    public List<Map<String,Object>> getUserChatMessages(String otherUser){
+        UserModel otherUserData = userRepository.findByName(otherUser).orElse(null);
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        if(otherUserData != null){
+            List<Map<String,Object>> messages = messageReceiverRepository.getAllUserChatMessages(currentUser.getId(), otherUserData.getId());
+            return messages;
+        }
+        else{
+            return null;
+        }
+    }
+
+    public List<Map<String,Object>> getRoomChatMessages(String room){
+        RoomModel roomData = roomRepository.findByName(room);
+        if(roomData != null){
+            return messageRoomRepository.getAllRoomChatMessages(roomData.getId());
+        }else {
+            return null;
+        }
+    }
+
 }

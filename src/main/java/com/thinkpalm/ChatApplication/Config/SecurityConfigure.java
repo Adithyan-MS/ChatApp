@@ -67,5 +67,4 @@ public class SecurityConfigure {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 }

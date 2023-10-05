@@ -41,4 +41,9 @@ public class MessageController {
         return new ResponseEntity<>(messageService.likeOrDislikeMessage(messageId),HttpStatus.OK);
     }
 
+    @GetMapping("/likes/users/{messageId}")
+    public ResponseEntity<List<Map<String,Object>>> getMessageLikedUsers(@PathVariable Integer messageId){
+        return new ResponseEntity<>(messageService.getMessageLikedUsers(messageId),HttpStatus.OK);
+    }
+
 }

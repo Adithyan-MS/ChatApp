@@ -108,7 +108,7 @@ public class MessageService {
         UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
         MessageModel message = messageRepository.findById(messageId).orElse(null);
 
-        if(likeRepository.checkAlreadyLiked(currentUser.getId(), messageId)==0){ //Write Query --> "select count(*) from like_message where user_id = ?1 and message_id = ?2"
+        if(likeRepository.checkAlreadyLiked(currentUser.getId(), messageId)==0){
             LikeModel likeMessageModel = new LikeModel();
             likeMessageModel.setUser(currentUser);
             likeMessageModel.setMessage(message);
@@ -124,9 +124,13 @@ public class MessageService {
     }
 
     public void updateLikeCount(MessageModel message){
-        Integer count = likeRepository.getMessageLikeCount(message.getId()); //Write Query --> "select count(*) from like_message where message_id = ?"
+        Integer count = likeRepository.getMessageLikeCount(message.getId());
         message.setLike_count(count);
         messageRepository.save(message);
+    }
+
+    public List<Map<String,Object>> getMessageLikedUsers(Integer message_id){
+        return likeRepository.getMessageLikedUsers(message_id);
     }
 
 }

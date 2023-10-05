@@ -15,20 +15,20 @@ import java.util.*;
 public class MessageService {
 
     private final UserRepository userRepository;
-
     private final MessageRepository messageRepository;
-
     private final MessageReceiverRepository messageReceiverRepository;
     private final RoomRepository roomRepository;
     private final MessageRoomRepository messageRoomRepository;
+    private final LikeRepository likeRepository;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository,UserRepository userRepository,MessageReceiverRepository messageReceiverRepository,RoomRepository roomRepository,MessageRoomRepository messageRoomRepository){
+    public MessageService(MessageRepository messageRepository,UserRepository userRepository,MessageReceiverRepository messageReceiverRepository,RoomRepository roomRepository,MessageRoomRepository messageRoomRepository,LikeRepository likeRepository){
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.messageReceiverRepository = messageReceiverRepository;
         this.roomRepository = roomRepository;
         this.messageRoomRepository = messageRoomRepository;
+        this.likeRepository = likeRepository;
     }
 
     public String sendMessage(MessageSendRequest messageSendRequest){
@@ -102,6 +102,31 @@ public class MessageService {
         }else {
             return null;
         }
+    }
+
+    public String likeOrDislikeMessage(Integer messageId){
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        MessageModel message = messageRepository.findById(messageId).orElse(null);
+
+        if(likeRepository.checkAlreadyLiked(currentUser.getId(), messageId)==0){ //Write Query --> "select count(*) from like_message where user_id = ?1 and message_id = ?2"
+            LikeModel likeMessageModel = new LikeModel();
+            likeMessageModel.setUser(currentUser);
+            likeMessageModel.setMessage(message);
+            likeMessageModel.setLiked_at(Timestamp.valueOf(LocalDateTime.now()));
+            likeRepository.save(likeMessageModel);
+            updateLikeCount(message);
+            return "message liked";
+        }else{
+            likeRepository.deleteLiked(currentUser.getId(),messageId);
+            updateLikeCount(message);
+            return "message unliked";
+        }
+    }
+
+    public void updateLikeCount(MessageModel message){
+        Integer count = likeRepository.getMessageLikeCount(message.getId()); //Write Query --> "select count(*) from like_message where message_id = ?"
+        message.setLike_count(count);
+        messageRepository.save(message);
     }
 
 }

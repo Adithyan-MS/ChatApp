@@ -27,15 +27,18 @@ public class MessageController {
     }
 
     @GetMapping("/user/{otherUser}")
-    private List<Map<String, Object>> getUserChatMessages(@PathVariable String otherUser){
+    public List<Map<String, Object>> getUserChatMessages(@PathVariable String otherUser){
         return messageService.getUserChatMessages(otherUser);
     }
 
     @GetMapping("/room/{roomName}")
-    private ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable String roomName){
+    public ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable String roomName){
         return new ResponseEntity<>(messageService.getRoomChatMessages(roomName), HttpStatus.OK);
     }
 
-
+    @PostMapping("/like/{messageId}")
+    public ResponseEntity<String> likeOrDislikeMessage(@PathVariable Integer messageId){
+        return new ResponseEntity<>(messageService.likeOrDislikeMessage(messageId),HttpStatus.OK);
+    }
 
 }

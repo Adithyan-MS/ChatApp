@@ -1,5 +1,7 @@
 package com.thinkpalm.ChatApplication.Controller;
 
+import com.thinkpalm.ChatApplication.Model.EditRequest;
+import com.thinkpalm.ChatApplication.Model.MessageForwardRequest;
 import com.thinkpalm.ChatApplication.Model.MessageSendRequest;
 import com.thinkpalm.ChatApplication.Service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,16 @@ public class MessageController {
     @PostMapping("/sendMessage")
     public String sendMessage(@RequestBody MessageSendRequest msg){
         return messageService.sendMessage(msg);
+    }
+
+    @PostMapping("/forwardMessage")
+    public String forwardMessage(@RequestBody MessageForwardRequest msg){
+        return messageService.forwardMessage(msg);
+    }
+
+    @PostMapping("/editMessage")
+    public ResponseEntity<String> editMessage(@RequestBody EditRequest editRequest){
+        return new ResponseEntity<>(messageService.editMessage(editRequest),HttpStatus.OK);
     }
 
     @GetMapping("/user/{otherUser}")

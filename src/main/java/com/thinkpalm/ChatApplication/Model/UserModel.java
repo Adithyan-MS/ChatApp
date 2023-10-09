@@ -34,7 +34,7 @@ public class UserModel {
     private String bio;
 
     @Column
-    private String profilPic;
+    private String profilePic;
 
     @Column
     @NotNull
@@ -93,12 +93,12 @@ public class UserModel {
         this.bio = bio;
     }
 
-    public String getProfilPic() {
-        return profilPic;
+    public String getProfilePic() {
+        return profilePic;
     }
 
-    public void setProfilPic(String profilPic) {
-        this.profilPic = profilPic;
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
     }
 
     public Timestamp getCreated_at() {

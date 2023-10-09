@@ -4,12 +4,8 @@ import com.thinkpalm.ChatApplication.Model.UserData;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -30,7 +26,7 @@ public class UserService {
             res.put("email",user.getEmail());
             res.put("phone_number",user.getPhone_number());
             res.put("bio",user.getBio());
-            res.put("profilePic",user.getProfilPic());
+            res.put("profilePic",user.getProfilePic());
             return res;
         }else{
             res.put("error","No such User Found!");
@@ -44,7 +40,7 @@ public class UserService {
         return "Bio updated";
     }
 
-    public List<UserData> getAllUsers() {
+    public List<UserData> getAllUsers(){
         List<UserModel> users = userRepository.findAll();
         List<UserData> res = new ArrayList<>();
         for(UserModel user: users){
@@ -54,7 +50,7 @@ public class UserService {
             userData.setEmail(user.getEmail());
             userData.setPhone_number(user.getPhone_number());
             userData.setBio(user.getBio());
-            userData.setProfilePic(user.getProfilPic());
+            userData.setProfilePic(user.getProfilePic());
             res.add(userData);
         }
         return res;

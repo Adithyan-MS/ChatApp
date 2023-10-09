@@ -20,15 +20,17 @@ public class MessageService {
     private final RoomRepository roomRepository;
     private final MessageRoomRepository messageRoomRepository;
     private final LikeRepository likeRepository;
+    private final MessageHistoryRepository messageHistoryRepository;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository,UserRepository userRepository,MessageReceiverRepository messageReceiverRepository,RoomRepository roomRepository,MessageRoomRepository messageRoomRepository,LikeRepository likeRepository){
+    public MessageService(MessageRepository messageRepository,UserRepository userRepository,MessageReceiverRepository messageReceiverRepository,RoomRepository roomRepository,MessageRoomRepository messageRoomRepository,LikeRepository likeRepository,MessageHistoryRepository messageHistoryRepository){
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.messageReceiverRepository = messageReceiverRepository;
         this.roomRepository = roomRepository;
         this.messageRoomRepository = messageRoomRepository;
         this.likeRepository = likeRepository;
+        this.messageHistoryRepository = messageHistoryRepository;
     }
 
     public String sendMessage(MessageSendRequest messageSendRequest){
@@ -82,6 +84,71 @@ public class MessageService {
         messageRepository.save(messageModel);
         return messageModel;
     }
+
+    public String forwardMessage(MessageForwardRequest messageForwardRequest){
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        for(Integer messageId : messageForwardRequest.getMessageIds()){
+            MessageModel originalMessage = messageRepository.findById(messageId).orElse(null);
+            if(originalMessage != null){
+                MessageModel newMessage = new MessageModel();
+                newMessage.setContent(originalMessage.getContent());
+                newMessage.setSender(currentUser);
+                newMessage.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+                messageRepository.save(newMessage);
+                for(Receiver receiver : messageForwardRequest.getReceivers()){
+                    if("user".equals(receiver.getType())){
+                        UserModel receiverUser = userRepository.findByName(receiver.getName()).orElse(null);
+                        if(receiverUser != null){
+                            MessageReceiverModel messageReceiver = new MessageReceiverModel();
+                            messageReceiver.setReceiver(receiverUser);
+                            messageReceiver.setMessage(newMessage);
+                            messageReceiver.setReceived_at(Timestamp.valueOf(LocalDateTime.now()));
+                            messageReceiverRepository.save(messageReceiver);
+                        }
+                    }else if("room".equals(receiver.getType())){
+                        RoomModel receiverRoom = roomRepository.findByName(receiver.getName());
+                        if(receiverRoom != null){
+                            MessageRoomModel messageRoom = new MessageRoomModel();
+                            messageRoom.setRoom(receiverRoom);
+                            messageRoom.setMessage(newMessage);
+                            messageRoom.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+                            messageRoomRepository.save(messageRoom);
+                        }
+                    }
+                }
+            }
+        }
+        return "message forwarded successfully";
+    }
+
+    public String editMessage(EditRequest editRequest){
+        MessageModel originalMessage = messageRepository.findById(editRequest.getMessageId()).orElse(null);
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        if(originalMessage!=null && currentUser!=null){
+            if (Objects.equals(originalMessage.getSender().getId(), currentUser.getId())){
+                MessageHistoryModel messageHistoryModel = new MessageHistoryModel();
+                messageHistoryModel.setMessage(originalMessage);
+                messageHistoryModel.setEdited_content(originalMessage.getContent());
+                messageHistoryModel.setUser(currentUser);
+                messageHistoryModel.setEdited_at(Timestamp.valueOf(LocalDateTime.now()));
+                messageHistoryRepository.save(messageHistoryModel);
+
+                originalMessage.setContent(editRequest.getNewContent());
+                messageRepository.save(originalMessage);
+                return "message edited successfully!";
+            }else{
+                return "this user can't edit this message";
+            }
+        }
+        return null;
+    }
+
+    //Delete message..
+//    public String deleteMessage(Integer messageId){
+//
+//    }
+
+
 
     public List<Map<String,Object>> getUserChatMessages(String otherUser){
         UserModel otherUserData = userRepository.findByName(otherUser).orElse(null);

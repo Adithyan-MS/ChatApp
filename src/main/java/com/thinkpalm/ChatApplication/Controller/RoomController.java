@@ -28,7 +28,7 @@ public class RoomController {
         return roomService.createRoom(createRoomRequest);
     }
 
-    @PostMapping("/{roomId}/uploadUserPicture")
+    @PostMapping("/{roomId}/uploadRoomPicture")
     public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile){
         return new ResponseEntity<>(imageService.uploadPicture(roomId,multipartFile), HttpStatus.OK);
     }

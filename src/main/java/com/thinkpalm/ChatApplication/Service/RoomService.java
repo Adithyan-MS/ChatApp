@@ -1,9 +1,6 @@
 package com.thinkpalm.ChatApplication.Service;
 
-import com.thinkpalm.ChatApplication.Model.CreateRoomRequest;
-import com.thinkpalm.ChatApplication.Model.ParticipantModel;
-import com.thinkpalm.ChatApplication.Model.RoomModel;
-import com.thinkpalm.ChatApplication.Model.UserModel;
+import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.ParticipantModelRepository;
 import com.thinkpalm.ChatApplication.Repository.RoomRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
@@ -13,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
 public class RoomService {
 
@@ -21,7 +20,7 @@ public class RoomService {
     private final ParticipantModelRepository participantModelRepository;
 
     @Autowired
-    public RoomService(RoomRepository roomRepository,UserRepository userRepository,ParticipantModelRepository participantModelRepository){
+    public RoomService(RoomRepository roomRepository, UserRepository userRepository, ParticipantModelRepository participantModelRepository){
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
         this.participantModelRepository = participantModelRepository;
@@ -61,4 +60,95 @@ public class RoomService {
         }
     }
 
+    public String addMember(Integer roomId,List<Integer> memberIds){
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if(room!=null){
+            if(participantModelRepository.existsRoomUser(roomId,currentUser.getId())!=0){
+                if(participantModelRepository.isUserAdmin(roomId,currentUser.getId())){
+                    for (Integer memberId : memberIds){
+                        UserModel user = userRepository.findById(memberId).orElse(null);
+                        if(user!=null){
+                            ParticipantModel participant = new ParticipantModel();
+                            participant.setRoom(room);
+                            participant.setUser(user);
+                            participant.setIs_admin(false);
+                            participant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
+                            participantModelRepository.save(participant);
+                        }
+                    }
+                    return "Member successfully added.";
+                }
+                else {
+                    return "User is not an admin!";
+                }
+            }else{
+                return "User is not a room member!";
+            }
+        }
+        else{
+            return "No such room!";
+        }
+    }
+
+    public String removeMember(Integer roomId,List<Integer> memberIds){
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if(room!=null){
+            if(participantModelRepository.existsRoomUser(roomId,currentUser.getId())!=0){
+                if(participantModelRepository.isUserAdmin(roomId,currentUser.getId())){
+                    String response="";
+                    for (Integer memberId : memberIds){
+                        if(participantModelRepository.existsRoomUser(roomId,memberId)!=0){
+                            participantModelRepository.deleteParticipant(roomId,memberId);
+                            response = response+"\n"+memberId+" removed";
+                        }else{
+                            response = response+"\n"+memberId+" is not a participant";
+                        }
+                    }
+                    return response;
+                }
+                else {
+                    return "User is not an admin!";
+                }
+            }else{
+                return "User is not a room member!";
+            }
+        }
+        else{
+            return "No such room!";
+        }
+    }
+
+    public String joinRoom(Integer roomId){
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if(room!=null){
+            ParticipantModel participant = new ParticipantModel();
+            participant.setUser(currentUser);
+            participant.setRoom(room);
+            participant.setIs_admin(false);
+            participant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
+            participantModelRepository.save(participant);
+            return "user joined.";
+        }
+        else{
+            return "No such room!";
+        }
+    }
+
+    public String exitRoom(Integer roomId){
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if(room!=null){
+            if(participantModelRepository.isUserAdmin(roomId, currentUser.getId() && participantModelRepository.findAllAdmins(roomId)!=0)
+
+
+            participantModelRepository.(roomId, currentUser.getId());
+            return "user exited from room.";
+        }
+        else{
+            return "No such room!";
+        }
+    }
 }

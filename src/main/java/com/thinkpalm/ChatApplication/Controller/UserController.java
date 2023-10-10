@@ -1,6 +1,6 @@
 package com.thinkpalm.ChatApplication.Controller;
 
-import com.thinkpalm.ChatApplication.Model.UserData;
+import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Service.ImageService;
 import com.thinkpalm.ChatApplication.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +27,12 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<UserData>> getAllUsers(){
+    public ResponseEntity<List<UserModel>> getAllUsers(){
         return new ResponseEntity<>(userService.getAllUsers(),HttpStatus.OK);
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<Map<String,Object>> getUserDetails(@PathVariable String username){
+    public ResponseEntity<UserModel> getUserDetails(@PathVariable String username){
         return new ResponseEntity<>(userService.getUserDetails(username), HttpStatus.OK);
     }
 

@@ -1,6 +1,5 @@
 package com.thinkpalm.ChatApplication.Service;
 
-import com.thinkpalm.ChatApplication.Model.UserData;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,21 +16,10 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public Map<String,Object> getUserDetails(String username){
+    public UserModel getUserDetails(String username){
         UserModel user = userRepository.findByName(username).orElse(null);
-        Map<String,Object> res = new HashMap<>();
-        if(user!=null){
-            res.put("id",user.getId());
-            res.put("name",user.getName());
-            res.put("email",user.getEmail());
-            res.put("phone_number",user.getPhone_number());
-            res.put("bio",user.getBio());
-            res.put("profilePic",user.getProfilePic());
-            return res;
-        }else{
-            res.put("error","No such User Found!");
-            return res;
-        }
+        user.setPassword(null);
+        return user;
     }
 
     public String updateUserBio(Map<String, String> request) {
@@ -40,20 +28,12 @@ public class UserService {
         return "Bio updated";
     }
 
-    public List<UserData> getAllUsers(){
+    public List<UserModel> getAllUsers(){
         List<UserModel> users = userRepository.findAll();
-        List<UserData> res = new ArrayList<>();
         for(UserModel user: users){
-            UserData userData = new UserData();
-            userData.setId(user.getId());
-            userData.setName(user.getName());
-            userData.setEmail(user.getEmail());
-            userData.setPhone_number(user.getPhone_number());
-            userData.setBio(user.getBio());
-            userData.setProfilePic(user.getProfilePic());
-            res.add(userData);
+            user.setPassword(null);
         }
-        return res;
+        return users;
     }
 
 }

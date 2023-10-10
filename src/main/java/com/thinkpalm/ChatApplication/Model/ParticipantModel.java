@@ -24,6 +24,9 @@ public class ParticipantModel {
     private Boolean is_admin;
 
     @Column
+    private Boolean is_active;
+
+    @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp joined_at;
 
@@ -62,6 +65,14 @@ public class ParticipantModel {
 
     public void setIs_admin(Boolean is_admin) {
         this.is_admin = is_admin;
+    }
+
+    public Boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(Boolean is_active) {
+        this.is_active = is_active;
     }
 
     public Timestamp getJoined_at() {

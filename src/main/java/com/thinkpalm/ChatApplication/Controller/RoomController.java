@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/chatApi/v1/room")
 public class RoomController {
@@ -26,6 +29,21 @@ public class RoomController {
     @PostMapping("/createRoom")
     public String createRoom(@RequestBody CreateRoomRequest createRoomRequest){
         return roomService.createRoom(createRoomRequest);
+    }
+
+    @PostMapping("/{roomId}/join")
+    public ResponseEntity<String> joinRoom(@PathVariable Integer roomId){
+        return new ResponseEntity<>(roomService.joinRoom(roomId),HttpStatus.OK);
+    }
+
+    @PostMapping("/{roomId}/addMember")
+    public ResponseEntity<String> addMember(@PathVariable Integer roomId, @RequestBody Map<String,List<Integer>> request){
+        return new ResponseEntity<>(roomService.addMember(roomId,request.get("members")),HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{roomId}/removeMember")
+    public ResponseEntity<String> removeMember(@PathVariable Integer roomId, @RequestBody Map<String,List<Integer>> request){
+        return new ResponseEntity<>(roomService.removeMember(roomId,request.get("members")),HttpStatus.OK);
     }
 
     @PostMapping("/{roomId}/uploadRoomPicture")

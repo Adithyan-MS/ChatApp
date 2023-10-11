@@ -31,6 +31,11 @@ public class RoomController {
         return roomService.createRoom(createRoomRequest);
     }
 
+    @PostMapping("/{roomId}/makeRoomAdmin/{otherUserId}")
+    public ResponseEntity<String> createRoom(@PathVariable Integer roomId,@PathVariable Integer otherUserId){
+        return new ResponseEntity<>(roomService.makeRoomAdmin(roomId,otherUserId),HttpStatus.OK);
+    }
+
     @PostMapping("/{roomId}/join")
     public ResponseEntity<String> joinRoom(@PathVariable Integer roomId){
         return new ResponseEntity<>(roomService.joinRoom(roomId),HttpStatus.OK);
@@ -41,13 +46,29 @@ public class RoomController {
         return new ResponseEntity<>(roomService.addMember(roomId,request.get("members")),HttpStatus.OK);
     }
 
-    @DeleteMapping("/{roomId}/removeMember")
+    @PostMapping("/{roomId}/removeMember")
     public ResponseEntity<String> removeMember(@PathVariable Integer roomId, @RequestBody Map<String,List<Integer>> request){
         return new ResponseEntity<>(roomService.removeMember(roomId,request.get("members")),HttpStatus.OK);
+    }
+
+    @PostMapping("/{roomId}/exitRoom")
+    public ResponseEntity<String> exitRoom(@PathVariable Integer roomId){
+        return new ResponseEntity<>(roomService.exitRoom(roomId),HttpStatus.OK);
     }
 
     @PostMapping("/{roomId}/uploadRoomPicture")
     public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile){
         return new ResponseEntity<>(imageService.uploadPicture(roomId,multipartFile), HttpStatus.OK);
     }
+
+    @GetMapping("/{roomId}/participants")
+    public ResponseEntity<List<Map<String, Object>>> getRoomPartcicpants(@PathVariable Integer roomId){
+        return new ResponseEntity<>(roomService.getRoomParticipants(roomId),HttpStatus.OK);
+    }
+
+    @GetMapping("/{roomId}/pastParticipants")
+    public ResponseEntity<List<Map<String, Object>>> getPastRoomParticipants(@PathVariable Integer roomId){
+        return new ResponseEntity<>(roomService.getPastRoomParticipants(roomId),HttpStatus.OK);
+    }
+
 }

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -36,12 +37,7 @@ public class AuthService {
     public String registerUser(UserModel user){
         try{
             user.setPassword(encoder.encode(user.getPassword()));
-            Date currentTime = new Date();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(currentTime);
-            Timestamp currentTimestamp = new Timestamp(calendar.getTimeInMillis());
-            user.setCreated_at(currentTimestamp);
-
+            user.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
             urep.save(user);
             return "success";
         }
@@ -58,7 +54,6 @@ public class AuthService {
             }
             else{
                 return "invalid username or password!";
-//            throw new UsernameNotFoundException("user not found");
             }
         }
         catch (Exception e){

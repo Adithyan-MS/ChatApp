@@ -1,9 +1,13 @@
 package com.thinkpalm.ChatApplication.Model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "like_message")
 public class LikeModel {
@@ -22,35 +26,4 @@ public class LikeModel {
     @Column
     private Timestamp liked_at;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public MessageModel getMessage() {
-        return message;
-    }
-
-    public void setMessage(MessageModel message) {
-        this.message = message;
-    }
-
-    public UserModel getUser() {
-        return user;
-    }
-
-    public void setUser(UserModel user) {
-        this.user = user;
-    }
-
-    public Timestamp getLiked_at() {
-        return liked_at;
-    }
-
-    public void setLiked_at(Timestamp liked_at) {
-        this.liked_at = liked_at;
-    }
 }

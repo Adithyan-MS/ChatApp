@@ -2,9 +2,13 @@ package com.thinkpalm.ChatApplication.Model;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "message_history")
 public class MessageHistoryModel {
@@ -26,43 +30,4 @@ public class MessageHistoryModel {
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp edited_at;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public MessageModel getMessage() {
-        return message;
-    }
-
-    public void setMessage(MessageModel message) {
-        this.message = message;
-    }
-
-    public String getEdited_content() {
-        return edited_content;
-    }
-
-    public void setEdited_content(String edited_content) {
-        this.edited_content = edited_content;
-    }
-
-    public UserModel getUser() {
-        return user;
-    }
-
-    public void setUser(UserModel user) {
-        this.user = user;
-    }
-
-    public Timestamp getEdited_at() {
-        return edited_at;
-    }
-
-    public void setEdited_at(Timestamp edited_at) {
-        this.edited_at = edited_at;
-    }
 }

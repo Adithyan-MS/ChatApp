@@ -1,24 +1,14 @@
 package com.thinkpalm.ChatApplication.Model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
 public class MessageSendRequest {
     private Message message;
     private Receiver receiver;
 
-    public Message getMessage() {
-        return message;
-    }
-
-    public void setMessage(Message message) {
-        this.message = message;
-    }
-
-    public Receiver getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(Receiver receiver) {
-        this.receiver = receiver;
-    }
 }

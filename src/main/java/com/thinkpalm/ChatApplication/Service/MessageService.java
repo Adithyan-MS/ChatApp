@@ -80,7 +80,7 @@ public class MessageService {
         if(message.getParentMessage() != null){
             MessageModel parentMessage = messageRepository.findById(message.getParentMessage()).orElse(null);
             if(parentMessage != null){
-                messageModel.setParent_message(parentMessage);
+                messageModel.setParent_messageModel(parentMessage);
             }
         }
         messageRepository.save(messageModel);

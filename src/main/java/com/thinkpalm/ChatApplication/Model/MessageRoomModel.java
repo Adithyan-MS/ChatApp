@@ -1,9 +1,13 @@
 package com.thinkpalm.ChatApplication.Model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "message_room")
 public class MessageRoomModel {
@@ -23,35 +27,4 @@ public class MessageRoomModel {
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp created_at;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public MessageModel getMessage() {
-        return message;
-    }
-
-    public void setMessage(MessageModel message) {
-        this.message = message;
-    }
-
-    public RoomModel getRoom() {
-        return room;
-    }
-
-    public void setRoom(RoomModel room) {
-        this.room = room;
-    }
-
-    public Timestamp getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(Timestamp created_at) {
-        this.created_at = created_at;
-    }
 }

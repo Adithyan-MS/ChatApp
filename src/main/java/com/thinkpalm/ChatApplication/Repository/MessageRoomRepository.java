@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,Integer> {
-    @Query(value = "SELECT m.id, m.content, m.sender_id, m.parent_message_id, m.like_count, m.is_starred, m.created_at\n" +
+    @Query(value = "SELECT m.id, m.content, m.sender_id, m.parent_message_id, m.like_count, m.created_at\n" +
             "FROM message AS m\n" +
             "INNER JOIN message_room AS mr ON m.id = mr.message_id\n" +
             "LEFT JOIN deleted_message AS dm ON m.id = dm.message_id AND dm.deleted_by = ?2\n" +

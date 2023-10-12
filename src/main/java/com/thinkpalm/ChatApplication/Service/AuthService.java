@@ -37,7 +37,6 @@ public class AuthService {
     public String registerUser(UserModel user){
         try{
             user.setPassword(encoder.encode(user.getPassword()));
-            user.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
             urep.save(user);
             return "success";
         }

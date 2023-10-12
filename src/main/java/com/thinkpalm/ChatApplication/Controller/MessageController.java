@@ -38,6 +38,11 @@ public class MessageController {
         return new ResponseEntity<>(messageService.editMessage(editRequest),HttpStatus.OK);
     }
 
+    @PostMapping("/deleteMessage")
+    public ResponseEntity<String> deleteMessage(@RequestBody Map<String,List<Integer>> deleteRequest){
+        return new ResponseEntity<>(messageService.deleteMessage(deleteRequest.get("messageIds")),HttpStatus.OK);
+    }
+
     @GetMapping("/user/{otherUser}")
     public List<Map<String, Object>> getUserChatMessages(@PathVariable String otherUser){
         return messageService.getUserChatMessages(otherUser);

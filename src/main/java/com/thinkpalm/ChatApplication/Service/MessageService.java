@@ -21,9 +21,10 @@ public class MessageService {
     private final MessageRoomRepository messageRoomRepository;
     private final LikeRepository likeRepository;
     private final MessageHistoryRepository messageHistoryRepository;
+    private final DeletedMessageRepository deletedMessageRepository;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository,UserRepository userRepository,MessageReceiverRepository messageReceiverRepository,RoomRepository roomRepository,MessageRoomRepository messageRoomRepository,LikeRepository likeRepository,MessageHistoryRepository messageHistoryRepository){
+    public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageReceiverRepository messageReceiverRepository, RoomRepository roomRepository, MessageRoomRepository messageRoomRepository, LikeRepository likeRepository, MessageHistoryRepository messageHistoryRepository, DeletedMessageRepository deletedMessageRepository){
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.messageReceiverRepository = messageReceiverRepository;
@@ -31,6 +32,7 @@ public class MessageService {
         this.messageRoomRepository = messageRoomRepository;
         this.likeRepository = likeRepository;
         this.messageHistoryRepository = messageHistoryRepository;
+        this.deletedMessageRepository = deletedMessageRepository;
     }
 
     public String sendMessage(MessageSendRequest messageSendRequest){
@@ -143,12 +145,24 @@ public class MessageService {
         return null;
     }
 
-    //Delete message..
-//    public String deleteMessage(Integer messageId){
-//
-//    }
-
-
+    public String deleteMessage(List<Integer> messageIds) {
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        String response = "";
+        for (Integer messageId : messageIds){
+            MessageModel message = messageRepository.findById(messageId).orElse(null);
+            if (message != null) {
+                DeletedMessageModel deletedMessage = new DeletedMessageModel();
+                deletedMessage.setMessage(message);
+                deletedMessage.setUser(currentUser);
+                deletedMessage.setDeleted_at(Timestamp.valueOf(LocalDateTime.now()));
+                deletedMessageRepository.save(deletedMessage);
+                response = response+ "\nMessage " + messageId + " deleted.";
+            } else {
+                response = response+ "\nInvalid messageId '" + messageId + "'!";
+            }
+        }
+        return response;
+    }
 
     public List<Map<String,Object>> getUserChatMessages(String otherUser){
         UserModel otherUserData = userRepository.findByName(otherUser).orElse(null);
@@ -163,9 +177,10 @@ public class MessageService {
     }
 
     public List<Map<String,Object>> getRoomChatMessages(String room){
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
         RoomModel roomData = roomRepository.findByName(room);
         if(roomData != null){
-            return messageRoomRepository.getAllRoomChatMessages(roomData.getId());
+            return messageRoomRepository.getAllRoomChatMessages(roomData.getId(),currentUser.getId());
         }else {
             return null;
         }

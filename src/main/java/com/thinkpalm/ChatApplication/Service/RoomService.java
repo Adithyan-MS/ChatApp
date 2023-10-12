@@ -63,30 +63,6 @@ public class RoomService {
         }
     }
 
-    public String makeRoomAdmin(Integer roomId,Integer otherUserId){
-        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
-        RoomModel room = roomRepository.findById(roomId).orElse(null);
-        if(room!=null){
-            if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
-                if(!participantModelRepository.isUserAdmin(roomId,otherUserId).orElse(false)){
-                    if(participantModelRepository.makeRoomAdmin(roomId,otherUserId)>0){
-                        return "User " + otherUserId + " is now an Admin";
-                    }else{
-                        return "User " + otherUserId + " can't be an Admin!";
-                    }
-                }else{
-                    return "User " + otherUserId + " is already an Admin!";
-                }
-            }
-            else {
-                return "You are not an admin!";
-            }
-        }
-        else{
-            return "No such room!";
-        }
-    }
-
     public String addMember(Integer roomId,List<Integer> memberIds){
         UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
@@ -179,6 +155,54 @@ public class RoomService {
             }else{
                 participantModelRepository.deactivateParticipant(roomId, currentUser.getId(), Timestamp.valueOf(LocalDateTime.now()));
                 return "user exited from room.";
+            }
+        }
+        else{
+            return "No such room!";
+        }
+    }
+
+    public String makeRoomAdmin(Integer roomId,Integer otherUserId){
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if(room!=null){
+            if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
+                if(!participantModelRepository.isUserAdmin(roomId,otherUserId).orElse(false)){
+                    if(participantModelRepository.makeRoomAdmin(roomId,otherUserId)>0){
+                        return "User " + otherUserId + " is now an Admin";
+                    }else{
+                        return "User " + otherUserId + " can't be an Admin!";
+                    }
+                }else{
+                    return "User " + otherUserId + " is already an Admin!";
+                }
+            }
+            else {
+                return "You are not an admin!";
+            }
+        }
+        else{
+            return "No such room!";
+        }
+    }
+
+    public String dismissRoomAdmin(Integer roomId,Integer otherUserId){
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if(room!=null){
+            if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
+                if(participantModelRepository.isUserAdmin(roomId,otherUserId).orElse(false)){
+                    if(participantModelRepository.dismissRoomAdmin(roomId,otherUserId)>0){
+                        return "User " + otherUserId + " is successfully dismissed as Admin";
+                    }else{
+                        return "User " + otherUserId + " can't be dismissed as Admin!";
+                    }
+                }else{
+                    return "User " + otherUserId + " is not an Admin!";
+                }
+            }
+            else {
+                return "You are not an admin!";
             }
         }
         else{

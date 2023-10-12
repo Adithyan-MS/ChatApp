@@ -26,6 +26,11 @@ public interface ParticipantModelRepository extends JpaRepository<ParticipantMod
     @Query(value = "update participant set is_admin = true where room_id = ?1 and user_id = ?2",nativeQuery = true)
     int makeRoomAdmin(Integer roomId, Integer otherUserId);
 
+    @Transactional
+    @Modifying
+    @Query(value = "update participant set is_admin = false where room_id = ?1 and user_id = ?2",nativeQuery = true)
+    int dismissRoomAdmin(Integer roomId, Integer otherUserId);
+
     @Query(value = "SELECT u.id, u.name, u.profile_pic, p.is_admin\n" +
             "FROM participant AS p\n" +
             "INNER JOIN user AS u ON p.user_id = u.id\n" +
@@ -50,8 +55,9 @@ public interface ParticipantModelRepository extends JpaRepository<ParticipantMod
 
     @Transactional
     @Modifying
-    @Query(value = "update participant set is_active = false where room_id = ?1 and user_id = ?2",nativeQuery = true)
+    @Query(value = "update participant set is_active = false,left_at = ?3 where room_id = ?1 and user_id = ?2",nativeQuery = true)
     void deactivateParticipant(Integer roomId, Integer memberId, Timestamp timestamp);
+
 }
 
 

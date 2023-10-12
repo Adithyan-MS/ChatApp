@@ -31,16 +31,6 @@ public class RoomController {
         return roomService.createRoom(createRoomRequest);
     }
 
-    @PostMapping("/{roomId}/makeRoomAdmin/{otherUserId}")
-    public ResponseEntity<String> createRoom(@PathVariable Integer roomId,@PathVariable Integer otherUserId){
-        return new ResponseEntity<>(roomService.makeRoomAdmin(roomId,otherUserId),HttpStatus.OK);
-    }
-
-    @PostMapping("/{roomId}/join")
-    public ResponseEntity<String> joinRoom(@PathVariable Integer roomId){
-        return new ResponseEntity<>(roomService.joinRoom(roomId),HttpStatus.OK);
-    }
-
     @PostMapping("/{roomId}/addMember")
     public ResponseEntity<String> addMember(@PathVariable Integer roomId, @RequestBody Map<String,List<Integer>> request){
         return new ResponseEntity<>(roomService.addMember(roomId,request.get("members")),HttpStatus.OK);
@@ -51,14 +41,24 @@ public class RoomController {
         return new ResponseEntity<>(roomService.removeMember(roomId,request.get("members")),HttpStatus.OK);
     }
 
+    @PostMapping("/{roomId}/join")
+    public ResponseEntity<String> joinRoom(@PathVariable Integer roomId){
+        return new ResponseEntity<>(roomService.joinRoom(roomId),HttpStatus.OK);
+    }
+
     @PostMapping("/{roomId}/exitRoom")
     public ResponseEntity<String> exitRoom(@PathVariable Integer roomId){
         return new ResponseEntity<>(roomService.exitRoom(roomId),HttpStatus.OK);
     }
 
-    @PostMapping("/{roomId}/uploadRoomPicture")
-    public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile){
-        return new ResponseEntity<>(imageService.uploadPicture(roomId,multipartFile), HttpStatus.OK);
+    @PostMapping("/{roomId}/makeRoomAdmin/{otherUserId}")
+    public ResponseEntity<String> makeRoomAdmin(@PathVariable Integer roomId,@PathVariable Integer otherUserId){
+        return new ResponseEntity<>(roomService.makeRoomAdmin(roomId,otherUserId),HttpStatus.OK);
+    }
+
+    @PostMapping("/{roomId}/dismissRoomAdmin/{otherUserId}")
+    public ResponseEntity<String> dismissRoomAdmin(@PathVariable Integer roomId,@PathVariable Integer otherUserId){
+        return new ResponseEntity<>(roomService.dismissRoomAdmin(roomId,otherUserId),HttpStatus.OK);
     }
 
     @GetMapping("/{roomId}/participants")
@@ -69,6 +69,11 @@ public class RoomController {
     @GetMapping("/{roomId}/pastParticipants")
     public ResponseEntity<List<Map<String, Object>>> getPastRoomParticipants(@PathVariable Integer roomId){
         return new ResponseEntity<>(roomService.getPastRoomParticipants(roomId),HttpStatus.OK);
+    }
+
+    @PostMapping("/{roomId}/uploadRoomPicture")
+    public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile){
+        return new ResponseEntity<>(imageService.uploadPicture(roomId,multipartFile), HttpStatus.OK);
     }
 
 }

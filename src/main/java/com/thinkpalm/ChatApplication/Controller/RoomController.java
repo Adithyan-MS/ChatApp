@@ -73,7 +73,7 @@ public class RoomController {
 
     @PostMapping("/{roomId}/uploadRoomPicture")
     public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile){
-        return new ResponseEntity<>(imageService.uploadPicture(roomId,multipartFile), HttpStatus.OK);
+        return new ResponseEntity<>(roomService.uploadPicture(roomId,multipartFile), HttpStatus.OK);
     }
 
 }

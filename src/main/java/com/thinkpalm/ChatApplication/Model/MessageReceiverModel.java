@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Setter
 @Entity
 @Table(name = "message_receiver")
-public class MessageReceiverModel {
+public class MessageReceiverModel extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,8 +28,5 @@ public class MessageReceiverModel {
     @JoinColumn(name = "receiver_id")
     private UserModel receiver;
 
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp received_at;
 
 }

@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Setter
 @Entity
 @Table(name = "message")
-public class MessageModel {
+public class MessageModel extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,10 +33,5 @@ public class MessageModel {
 
     @Column
     private Integer like_count;
-
-    @Column
-    @NonNull
-    @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp created_at;
 
 }

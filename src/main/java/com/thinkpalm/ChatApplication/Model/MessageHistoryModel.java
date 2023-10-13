@@ -11,9 +11,9 @@ import java.sql.Timestamp;
 @Setter
 @Entity
 @Table(name = "message_history")
-public class MessageHistoryModel {
+public class MessageHistoryModel extends Auditable{
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "message_id")
@@ -26,8 +26,5 @@ public class MessageHistoryModel {
     @JoinColumn(name = "edited_by")
     private UserModel user;
 
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp edited_at;
 
 }

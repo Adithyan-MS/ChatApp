@@ -10,9 +10,9 @@ import java.sql.Timestamp;
 @Setter
 @Entity
 @Table(name = "like_message")
-public class LikeModel {
+public class LikeModel extends Auditable{
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
@@ -22,8 +22,5 @@ public class LikeModel {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
-
-    @Column
-    private Timestamp liked_at;
 
 }

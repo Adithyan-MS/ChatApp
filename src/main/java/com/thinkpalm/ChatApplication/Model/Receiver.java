@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class Receiver {
     private String type;
-    private String name;
+    private Integer id;
 
 }

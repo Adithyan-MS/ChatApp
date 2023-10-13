@@ -7,6 +7,7 @@ import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -19,12 +20,14 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
     private final ParticipantModelRepository participantModelRepository;
+    private final ImageService imageService;
 
     @Autowired
-    public RoomService(RoomRepository roomRepository, UserRepository userRepository, ParticipantModelRepository participantModelRepository){
+    public RoomService(RoomRepository roomRepository, UserRepository userRepository, ParticipantModelRepository participantModelRepository, ImageService imageService){
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
         this.participantModelRepository = participantModelRepository;
+        this.imageService = imageService;
     }
 
     public String createRoom(CreateRoomRequest createRoomRequest) {
@@ -34,7 +37,6 @@ public class RoomService {
             room.setName(createRoomRequest.getName());
             room.setDescription(createRoomRequest.getDesc());
             room.setRoom_pic(createRoomRequest.getPic());
-            room.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
             roomRepository.save(room);
 
             ParticipantModel participantModel = new ParticipantModel();
@@ -45,8 +47,8 @@ public class RoomService {
             participantModel.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
             participantModelRepository.save(participantModel);
 
-            for (String participant : createRoomRequest.getParticipants()) {
-                UserModel user = userRepository.findByName(participant).orElse(null);
+            for (Integer participant : createRoomRequest.getParticipants()) {
+                UserModel user = userRepository.findById(participant).orElse(null);
                 if (user != null) {
                     ParticipantModel participantModel1 = new ParticipantModel();
                     participantModel1.setRoom(room);
@@ -216,5 +218,14 @@ public class RoomService {
 
     public List<Map<String, Object>> getPastRoomParticipants(Integer roomId){
         return participantModelRepository.getPastRoomParticipants(roomId);
+    }
+
+    public String uploadPicture(Integer roomId, MultipartFile multipartFile) {
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
+            return imageService.uploadPicture(roomId,multipartFile);
+        }else{
+            return "You are not an Admin!";
+        }
     }
 }

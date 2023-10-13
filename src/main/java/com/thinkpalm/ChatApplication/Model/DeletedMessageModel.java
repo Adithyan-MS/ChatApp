@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Setter
 @Entity
 @Table(name="deleted_message")
-public class DeletedMessageModel {
+public class DeletedMessageModel extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -23,6 +23,4 @@ public class DeletedMessageModel {
     @JoinColumn(name = "deleted_by")
     private UserModel user;
 
-    @Column
-    private Timestamp deleted_at;
 }

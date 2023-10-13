@@ -17,18 +17,13 @@ import java.sql.Timestamp;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class Auditable {
-    @CreatedBy
-    protected String createdBy;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     protected Timestamp createdAt;
 
-    @LastModifiedBy
-    protected String lastModifiedBy;
-
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
-    protected Timestamp lastModifiedAt;
+    protected Timestamp modifiedAt;
 }
 

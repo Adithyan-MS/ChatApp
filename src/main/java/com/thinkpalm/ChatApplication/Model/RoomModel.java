@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Setter
 @Entity
 @Table(name = "room")
-public class RoomModel {
+public class RoomModel extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -26,13 +26,5 @@ public class RoomModel {
     @Column
     private String room_pic;
 
-    @Column
-    @NonNull
-    @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp created_at;
-
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp modified_at;
 
 }

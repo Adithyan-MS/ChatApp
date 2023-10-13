@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Setter
 @Entity
 @Table(name = "message_room")
-public class MessageRoomModel {
+public class MessageRoomModel extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -22,9 +22,5 @@ public class MessageRoomModel {
     @ManyToOne
     @JoinColumn(name = "room_id")
     private RoomModel room;
-
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp created_at;
 
 }

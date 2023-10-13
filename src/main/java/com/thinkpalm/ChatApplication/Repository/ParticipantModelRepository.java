@@ -18,7 +18,7 @@ public interface ParticipantModelRepository extends JpaRepository<ParticipantMod
     @Query(value = "select is_admin from participant where room_id = ?1 and user_id = ?2",nativeQuery = true)
     Optional<Boolean> isUserAdmin(Integer roomId, Integer userid);
 
-    @Query(value = "select count(*) from participant where room_id=? and is_admin=true",nativeQuery = true)
+    @Query(value = "select count(*) from participant where room_id=? and is_admin=true and is_active=true",nativeQuery = true)
     Integer getRoomAdminCount(Integer roomId);
 
     @Transactional

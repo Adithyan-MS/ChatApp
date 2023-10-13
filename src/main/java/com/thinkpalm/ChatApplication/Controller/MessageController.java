@@ -43,14 +43,14 @@ public class MessageController {
         return new ResponseEntity<>(messageService.deleteMessage(deleteRequest.get("messageIds")),HttpStatus.OK);
     }
 
-    @GetMapping("/user/{otherUser}")
-    public List<Map<String, Object>> getUserChatMessages(@PathVariable String otherUser){
-        return messageService.getUserChatMessages(otherUser);
+    @GetMapping("/user/{otherUserId}")
+    public List<Map<String, Object>> getUserChatMessages(@PathVariable Integer otherUserId){
+        return messageService.getUserChatMessages(otherUserId);
     }
 
-    @GetMapping("/room/{roomName}")
-    public ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable String roomName){
-        return new ResponseEntity<>(messageService.getRoomChatMessages(roomName), HttpStatus.OK);
+    @GetMapping("/room/{roomId}")
+    public ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable Integer roomId){
+        return new ResponseEntity<>(messageService.getRoomChatMessages(roomId), HttpStatus.OK);
     }
 
     @PostMapping("/like/{messageId}")

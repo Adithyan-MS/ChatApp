@@ -5,6 +5,9 @@ import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -24,7 +27,7 @@ public class UserService {
 
     public String updateUserBio(Map<String, String> request) {
         String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
-        userRepository.updateUserBio(currentUser,request.get("bio"));
+        userRepository.updateUserBio(currentUser,request.get("bio"), Timestamp.valueOf(LocalDateTime.now()));
         return "Bio updated";
     }
 

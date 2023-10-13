@@ -39,12 +39,11 @@ public class MessageService {
         Message message = messageSendRequest.getMessage();
         Receiver receiver = messageSendRequest.getReceiver();
         if("user".equals(receiver.getType())){
-            UserModel receiverUser = userRepository.findByName(receiver.getName()).orElse(null);
+            UserModel receiverUser = userRepository.findById(receiver.getId()).orElse(null);
             if(receiverUser != null){
                 MessageReceiverModel messageReceiverModel = new MessageReceiverModel();
                 messageReceiverModel.setReceiver(receiverUser);
                 messageReceiverModel.setMessage(saveMessage(message));
-                messageReceiverModel.setReceived_at(Timestamp.valueOf(LocalDateTime.now()));
                 messageReceiverRepository.save(messageReceiverModel);
 
                 return "message send successfully";
@@ -54,12 +53,11 @@ public class MessageService {
             }
         }
         else if("room".equals(receiver.getType())){
-            RoomModel receiverRoom = roomRepository.findByName(receiver.getName());
+            RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
             if(receiverRoom != null){
                 MessageRoomModel messageRoomModel = new MessageRoomModel();
                 messageRoomModel.setRoom(receiverRoom);
                 messageRoomModel.setMessage(saveMessage(message));
-                messageRoomModel.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
                 messageRoomRepository.save(messageRoomModel);
 
                 return "message send successfully";
@@ -75,7 +73,6 @@ public class MessageService {
         Optional<UserModel> sender = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName());
         MessageModel messageModel = new MessageModel();
         messageModel.setContent(message.getContent());
-        messageModel.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
         messageModel.setSender(sender.get());
         if(message.getParentMessage() != null){
             MessageModel parentMessage = messageRepository.findById(message.getParentMessage()).orElse(null);
@@ -95,25 +92,22 @@ public class MessageService {
                 MessageModel newMessage = new MessageModel();
                 newMessage.setContent(originalMessage.getContent());
                 newMessage.setSender(currentUser);
-                newMessage.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
                 messageRepository.save(newMessage);
                 for(Receiver receiver : messageForwardRequest.getReceivers()){
                     if("user".equals(receiver.getType())){
-                        UserModel receiverUser = userRepository.findByName(receiver.getName()).orElse(null);
+                        UserModel receiverUser = userRepository.findById(receiver.getId()).orElse(null);
                         if(receiverUser != null){
                             MessageReceiverModel messageReceiver = new MessageReceiverModel();
                             messageReceiver.setReceiver(receiverUser);
                             messageReceiver.setMessage(newMessage);
-                            messageReceiver.setReceived_at(Timestamp.valueOf(LocalDateTime.now()));
                             messageReceiverRepository.save(messageReceiver);
                         }
                     }else if("room".equals(receiver.getType())){
-                        RoomModel receiverRoom = roomRepository.findByName(receiver.getName());
+                        RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
                         if(receiverRoom != null){
                             MessageRoomModel messageRoom = new MessageRoomModel();
                             messageRoom.setRoom(receiverRoom);
                             messageRoom.setMessage(newMessage);
-                            messageRoom.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
                             messageRoomRepository.save(messageRoom);
                         }
                     }
@@ -132,7 +126,6 @@ public class MessageService {
                 messageHistoryModel.setMessage(originalMessage);
                 messageHistoryModel.setEdited_content(originalMessage.getContent());
                 messageHistoryModel.setUser(currentUser);
-                messageHistoryModel.setEdited_at(Timestamp.valueOf(LocalDateTime.now()));
                 messageHistoryRepository.save(messageHistoryModel);
 
                 originalMessage.setContent(editRequest.getNewContent());
@@ -154,7 +147,6 @@ public class MessageService {
                 DeletedMessageModel deletedMessage = new DeletedMessageModel();
                 deletedMessage.setMessage(message);
                 deletedMessage.setUser(currentUser);
-                deletedMessage.setDeleted_at(Timestamp.valueOf(LocalDateTime.now()));
                 deletedMessageRepository.save(deletedMessage);
                 response = response+ "\nMessage " + messageId + " deleted.";
             } else {
@@ -164,8 +156,8 @@ public class MessageService {
         return response;
     }
 
-    public List<Map<String,Object>> getUserChatMessages(String otherUser){
-        UserModel otherUserData = userRepository.findByName(otherUser).orElse(null);
+    public List<Map<String,Object>> getUserChatMessages(Integer otherUserId){
+        UserModel otherUserData = userRepository.findById(otherUserId).orElse(null);
         UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
         if(otherUserData != null){
             List<Map<String,Object>> messages = messageReceiverRepository.getAllUserChatMessages(currentUser.getId(), otherUserData.getId());
@@ -176,9 +168,9 @@ public class MessageService {
         }
     }
 
-    public List<Map<String,Object>> getRoomChatMessages(String room){
+    public List<Map<String,Object>> getRoomChatMessages(Integer roomId){
         UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
-        RoomModel roomData = roomRepository.findByName(room);
+        RoomModel roomData = roomRepository.findById(roomId).orElse(null);
         if(roomData != null){
             return messageRoomRepository.getAllRoomChatMessages(roomData.getId(),currentUser.getId());
         }else {
@@ -194,7 +186,6 @@ public class MessageService {
             LikeModel likeMessageModel = new LikeModel();
             likeMessageModel.setUser(currentUser);
             likeMessageModel.setMessage(message);
-            likeMessageModel.setLiked_at(Timestamp.valueOf(LocalDateTime.now()));
             likeRepository.save(likeMessageModel);
             updateLikeCount(message);
             return "message liked";

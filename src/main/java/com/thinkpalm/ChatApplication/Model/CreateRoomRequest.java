@@ -11,6 +11,6 @@ public class CreateRoomRequest {
     private String name;
     private String desc;
     private String pic;
-    private List<String> participants;
+    private List<Integer> participants;
 
 }

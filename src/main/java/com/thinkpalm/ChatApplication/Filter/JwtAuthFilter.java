@@ -1,5 +1,7 @@
 package com.thinkpalm.ChatApplication.Filter;
 
+import com.thinkpalm.ChatApplication.Model.Token;
+import com.thinkpalm.ChatApplication.Repository.TokenRepository;
 import com.thinkpalm.ChatApplication.Service.JwtService;
 import com.thinkpalm.ChatApplication.Service.UserInfoService;
 import jakarta.servlet.FilterChain;
@@ -21,9 +23,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtService jwtService;
-
     @Autowired
     private UserInfoService userInfoService;
+    @Autowired
+    private TokenRepository tokenRepository;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
@@ -36,7 +39,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
             UserDetails userDetails = userInfoService.loadUserByUsername(username);
-            if(jwtService.validateToken(token,userDetails)){
+            boolean isTokenValid = tokenRepository.findByToken(token)
+                    .map(t->!t.isExpired() && !t.isRevoked())
+                    .orElse(false);
+            if(jwtService.validateToken(token,userDetails) && isTokenValid){
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);

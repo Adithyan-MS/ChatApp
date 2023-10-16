@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Receiver {
-    private String type;
+    private ReceiverType type;
     private Integer id;
 
 }

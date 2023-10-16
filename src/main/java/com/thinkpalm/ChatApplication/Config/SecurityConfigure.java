@@ -14,11 +14,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 
 @Configuration
@@ -26,9 +28,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfigure {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final LogoutHandler logoutHandler;
     @Autowired
-    public SecurityConfigure(JwtAuthFilter jwtAuthFilter){
+    public SecurityConfigure(JwtAuthFilter jwtAuthFilter, LogoutHandler logoutHandler){
         this.jwtAuthFilter = jwtAuthFilter;
+        this.logoutHandler = logoutHandler;
     }
 
     @Bean
@@ -47,6 +51,11 @@ public class SecurityConfigure {
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout->logout
+                        .logoutUrl("/chatApi/v1/auth/logout")
+                        .addLogoutHandler(logoutHandler)
+                        .logoutSuccessHandler(((request, response, authentication) -> SecurityContextHolder.clearContext()))
+                )
                 .build();
     }
 

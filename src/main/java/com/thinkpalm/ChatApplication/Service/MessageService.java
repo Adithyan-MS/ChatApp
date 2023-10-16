@@ -38,7 +38,7 @@ public class MessageService {
     public String sendMessage(MessageSendRequest messageSendRequest){
         Message message = messageSendRequest.getMessage();
         Receiver receiver = messageSendRequest.getReceiver();
-        if("user".equals(receiver.getType())){
+        if(ReceiverType.USER == receiver.getType()){
             UserModel receiverUser = userRepository.findById(receiver.getId()).orElse(null);
             if(receiverUser != null){
                 MessageReceiverModel messageReceiverModel = new MessageReceiverModel();
@@ -52,7 +52,7 @@ public class MessageService {
                 return "receiver not found!";
             }
         }
-        else if("room".equals(receiver.getType())){
+        else if(ReceiverType.ROOM == receiver.getType()){
             RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
             if(receiverRoom != null){
                 MessageRoomModel messageRoomModel = new MessageRoomModel();

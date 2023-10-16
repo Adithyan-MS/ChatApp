@@ -39,4 +39,8 @@ public class UserService {
         return users;
     }
 
+//    public List<Object> getAllActiveUsers(){
+//        List<Object> users = userRepository.findAllActiveChats();
+//        return users;
+//    }
 }

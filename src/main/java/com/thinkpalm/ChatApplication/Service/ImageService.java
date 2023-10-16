@@ -37,7 +37,6 @@ public class ImageService {
 
     public String uploadPicture(MultipartFile multipartFile) throws IOException {
         if(!multipartFile.isEmpty()){
-
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String formattedDateTime = dateFormat.format(new Date());
 
@@ -48,7 +47,6 @@ public class ImageService {
             if(user!=null){
                 try(OutputStream outputStream = new FileOutputStream(String.valueOf(filePath))){
                     outputStream.write(multipartFile.getBytes());
-
                     user.setProfilePic(fileName);
                     userRepository.save(user);
                 } catch (FileNotFoundException e) {
@@ -84,7 +82,6 @@ public class ImageService {
                     throw new RuntimeException(e);
                 }
             }
-
             return fileName + " uploaded";
         }else{
             return "file not found!";

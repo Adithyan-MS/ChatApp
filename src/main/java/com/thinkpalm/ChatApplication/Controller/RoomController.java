@@ -27,8 +27,8 @@ public class RoomController {
     }
 
     @PostMapping("/createRoom")
-    public String createRoom(@RequestBody CreateRoomRequest createRoomRequest){
-        return roomService.createRoom(createRoomRequest);
+    public ResponseEntity<String> createRoom(@RequestBody CreateRoomRequest createRoomRequest){
+        return new ResponseEntity<>(roomService.createRoom(createRoomRequest),HttpStatus.OK);
     }
 
     @PostMapping("/{roomId}/addMember")

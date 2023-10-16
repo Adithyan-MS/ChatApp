@@ -3,6 +3,7 @@ package com.thinkpalm.ChatApplication.Controller;
 import com.thinkpalm.ChatApplication.Model.LoginRequest;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,17 +31,5 @@ public class AuthController {
     public ResponseEntity<String> userLogin(@RequestBody LoginRequest loginRequest){
         return new ResponseEntity<>(userv.loginUser(loginRequest),HttpStatus.OK);
     }
-
-    @GetMapping("/hey")
-     public String getRes(){
-        return "heyt";
-     }
-
-    @GetMapping("/hello")
-    public String getRe(){
-        return SecurityContextHolder.getContext().getAuthentication().getName();
-    }
-
-
 
 }

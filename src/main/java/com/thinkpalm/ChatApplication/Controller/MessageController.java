@@ -24,13 +24,13 @@ public class MessageController {
     }
 
     @PostMapping("/sendMessage")
-    public String sendMessage(@RequestBody MessageSendRequest msg){
-        return messageService.sendMessage(msg);
+    public ResponseEntity<String> sendMessage(@RequestBody MessageSendRequest msg){
+        return new ResponseEntity<>(messageService.sendMessage(msg),HttpStatus.OK);
     }
 
     @PostMapping("/forwardMessage")
-    public String forwardMessage(@RequestBody MessageForwardRequest msg){
-        return messageService.forwardMessage(msg);
+    public ResponseEntity<String> forwardMessage(@RequestBody MessageForwardRequest msg){
+        return new ResponseEntity<>(messageService.forwardMessage(msg),HttpStatus.OK);
     }
 
     @PostMapping("/editMessage")
@@ -44,8 +44,8 @@ public class MessageController {
     }
 
     @GetMapping("/user/{otherUserId}")
-    public List<Map<String, Object>> getUserChatMessages(@PathVariable Integer otherUserId){
-        return messageService.getUserChatMessages(otherUserId);
+    public ResponseEntity<List<Map<String, Object>>> getUserChatMessages(@PathVariable Integer otherUserId){
+        return new ResponseEntity<>(messageService.getUserChatMessages(otherUserId),HttpStatus.OK);
     }
 
     @GetMapping("/room/{roomId}")

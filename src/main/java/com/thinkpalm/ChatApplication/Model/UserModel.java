@@ -4,6 +4,7 @@ package com.thinkpalm.ChatApplication.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;

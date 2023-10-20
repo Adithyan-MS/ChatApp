@@ -39,8 +39,9 @@ public class UserService {
         return users;
     }
 
-//    public List<Object> getAllActiveUsers(){
-//        List<Object> users = userRepository.findAllActiveChats();
-//        return users;
-//    }
+    public List<Map<String,Object>> getAllChatsOfUsers() {
+        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        List<Map<String, Object>> users = userRepository.findAllChatsOfUser(currentUser.getId());
+        return users;
+    }
 }

@@ -36,6 +36,11 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserDetails(username), HttpStatus.OK);
     }
 
+    @GetMapping("/chats")
+    public ResponseEntity<List<Map<String,Object>>> getAllChatsOfUsers(){
+        return new ResponseEntity<>(userService.getAllChatsOfUsers(),HttpStatus.OK);
+    }
+
     @PostMapping("/updateUserBio")
     public ResponseEntity<String> updateUserBio(@RequestBody Map<String,String> request){
         return new ResponseEntity<>(userService.updateUserBio(request),HttpStatus.OK);

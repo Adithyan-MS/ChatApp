@@ -94,7 +94,7 @@ public class MessageService {
                 newMessage.setSender(currentUser);
                 messageRepository.save(newMessage);
                 for(Receiver receiver : messageForwardRequest.getReceivers()){
-                    if("user".equals(receiver.getType())){
+                    if(ReceiverType.USER == receiver.getType()){
                         UserModel receiverUser = userRepository.findById(receiver.getId()).orElse(null);
                         if(receiverUser != null){
                             MessageReceiverModel messageReceiver = new MessageReceiverModel();
@@ -102,7 +102,7 @@ public class MessageService {
                             messageReceiver.setMessage(newMessage);
                             messageReceiverRepository.save(messageReceiver);
                         }
-                    }else if("room".equals(receiver.getType())){
+                    }else if(ReceiverType.ROOM == receiver.getType()){
                         RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
                         if(receiverRoom != null){
                             MessageRoomModel messageRoom = new MessageRoomModel();

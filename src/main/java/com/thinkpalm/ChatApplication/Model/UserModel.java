@@ -3,12 +3,9 @@ package com.thinkpalm.ChatApplication.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -25,19 +22,24 @@ public class UserModel extends Auditable{
 
     @Column
     @NotNull
+    @Size(max = 15,min = 3)
     private String name;
 
     @Column
     @NotNull
+    @NotEmpty
+    @Size(min = 5)
     private String password;
 
     @Column
     @NotNull
+    @Email
     private String email;
 
     @Column
     @NotNull
-    private Integer phone_number;
+    @Pattern(regexp = "^[0-9]{10}$",message = "invalid phone number")
+    private String phone_number;
 
     @Column
     private String bio;

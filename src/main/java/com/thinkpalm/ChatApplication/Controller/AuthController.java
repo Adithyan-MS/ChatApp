@@ -23,8 +23,6 @@ public class AuthController {
 
     @PostMapping("/register")
 
-
-
     public ResponseEntity<String> userRegister(@RequestBody @Valid UserModel user){
         String res = userv.registerUser(user);
         return new ResponseEntity<>(res, HttpStatus.OK);

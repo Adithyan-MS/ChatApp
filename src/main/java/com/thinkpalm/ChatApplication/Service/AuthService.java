@@ -7,6 +7,7 @@ import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.TokenRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import jakarta.validation.Valid;
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,15 +37,19 @@ public class AuthService {
 
     public String registerUser(UserModel user){
         try{
-            user.setPassword(encoder.encode(user.getPassword()));
-            UserModel newUser = urep.save(user);
-            String jwtToken =  jwtService.generateToken(user.getName());
-            revokeAllUserTokens(newUser);
-            saveUserToken(newUser, jwtToken);
-            return jwtToken;
+            if(!urep.existByNameOrPhonenumber(user.getName(),user.getPhone_number()).isEmpty())
+                return "username or phone-number already exists!";
+            else {
+                user.setPassword(encoder.encode(user.getPassword()));
+                UserModel newUser = urep.save(user);
+                String jwtToken =  jwtService.generateToken(user.getName());
+                revokeAllUserTokens(newUser);
+                saveUserToken(newUser, jwtToken);
+                return jwtToken;
+            }
         }
         catch (Exception e){
-            return "Registration Unsuccessfull";
+            return "Registration Failed!";
         }
     }
 

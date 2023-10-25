@@ -38,4 +38,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "GROUP BY id, name, profile_pic, type\n" +
             "ORDER BY max_modified_at DESC",nativeQuery = true)
     List<Map<String,Object>> findAllChatsOfUser(Integer currentUserId);
+
+    @Query(value = "select * from user where name = ?1 or phone_number = ?2",nativeQuery = true)
+    List<UserModel> existByNameOrPhonenumber(String name, String phoneNumber);
 }

@@ -43,6 +43,7 @@ public class UserModel extends Auditable{
     private String phone_number;
 
     @Column
+    @Size(max = 200)
     private String bio;
 
     @Column

@@ -14,23 +14,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/chatApi/v1/auth")
 public class AuthController {
 
-    private final AuthService userv;
+    private final AuthService authService;
 
     @Autowired
-    public AuthController(AuthService userv){
-        this.userv = userv;
+    public AuthController(AuthService authService){
+        this.authService = authService;
     }
 
     @PostMapping("/register")
-
-    public ResponseEntity<String> userRegister(@RequestBody @Valid UserModel user){
-        String res = userv.registerUser(user);
-        return new ResponseEntity<>(res, HttpStatus.OK);
+    public ResponseEntity<Object> userRegister(@RequestBody @Valid UserModel user){
+        return new ResponseEntity<>(authService.registerUser(user), HttpStatus.OK);
     }
 
      @PostMapping("/login")
     public ResponseEntity<String> userLogin(@RequestBody LoginRequest loginRequest){
-        return new ResponseEntity<>(userv.loginUser(loginRequest),HttpStatus.OK);
+        return new ResponseEntity<>(authService.loginUser(loginRequest),HttpStatus.OK);
     }
 
 }

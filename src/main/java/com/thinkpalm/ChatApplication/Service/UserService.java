@@ -27,7 +27,7 @@ public class UserService {
 
     public String updateUserBio(Map<String, String> request) {
         String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
-        userRepository.updateUserBio(currentUser,request.get("bio"), Timestamp.valueOf(LocalDateTime.now()));
+        userRepository.updateUserBio(currentUser,request.get("bio"));
         return "Bio updated";
     }
 

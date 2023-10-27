@@ -6,14 +6,16 @@ import com.thinkpalm.ChatApplication.Validation.EmailValid;
 import com.thinkpalm.ChatApplication.Validation.NameValid;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "user")
 public class UserModel extends Auditable{

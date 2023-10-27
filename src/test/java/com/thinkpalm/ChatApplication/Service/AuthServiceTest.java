@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 public class AuthServiceTest {
     @BeforeEach
     void setUp() {
+
     }
 
     @Test
@@ -15,5 +16,6 @@ public class AuthServiceTest {
 
     @Test
     void loginUser() {
+
     }
 }

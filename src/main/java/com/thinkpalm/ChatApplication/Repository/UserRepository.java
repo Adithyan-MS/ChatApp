@@ -16,8 +16,8 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
 
     @Transactional
     @Modifying
-    @Query(value = "update user set bio = ?2,modified_at = ?3 where name = ?1",nativeQuery = true)
-    void updateUserBio(String username, String bio, Timestamp timestamp);
+    @Query(value = "update user set bio = ?2 where name = ?1",nativeQuery = true)
+    void updateUserBio(String username, String bio);
 
     @Query(value = "SELECT id, name, profile_pic, type, max(modified_at) as max_modified_at\n" +
             "FROM (\n" +
@@ -41,4 +41,5 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
 
     @Query(value = "select * from user where name = ?1 or phone_number = ?2",nativeQuery = true)
     List<UserModel> existByNameOrPhonenumber(String name, String phoneNumber);
+
 }

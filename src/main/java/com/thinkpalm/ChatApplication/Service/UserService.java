@@ -4,6 +4,7 @@ import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -21,14 +22,22 @@ public class UserService {
 
     public UserModel getUserDetails(String username){
         UserModel user = userRepository.findByName(username).orElse(null);
-        user.setPassword(null);
-        return user;
+        if (user!=null){
+            user.setPassword(null);
+            return user;
+        }else{
+            throw new UsernameNotFoundException("User Not Found!");
+        }
     }
 
     public String updateUserBio(Map<String, String> request) {
         String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
-        userRepository.updateUserBio(currentUser,request.get("bio"));
-        return "Bio updated";
+        if(!currentUser.isEmpty()){
+            userRepository.updateUserBio(currentUser,request.get("bio"));
+            return "Bio updated";
+        }else{
+            throw new UsernameNotFoundException("User Not Found!");
+        }
     }
 
     public List<UserModel> getAllUsers(){
@@ -41,7 +50,11 @@ public class UserService {
 
     public List<Map<String,Object>> getAllChatsOfUsers() {
         UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
-        List<Map<String, Object>> users = userRepository.findAllChatsOfUser(currentUser.getId());
-        return users;
+        if (currentUser!=null){
+            List<Map<String, Object>> users = userRepository.findAllChatsOfUser(currentUser.getId());
+            return users;
+        }else{
+            throw new UsernameNotFoundException("User Not Found!");
+        }
     }
 }

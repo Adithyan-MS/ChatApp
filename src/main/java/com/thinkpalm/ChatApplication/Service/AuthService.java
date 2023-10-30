@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Exception.DuplicateEntryException;
 import com.thinkpalm.ChatApplication.Model.LoginRequest;
 import com.thinkpalm.ChatApplication.Model.Token;
 import com.thinkpalm.ChatApplication.Model.TokenType;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +35,10 @@ public class AuthService {
     }
 
     public String registerUser(UserModel user){
-        try{
-            if(!userRepository.existByNameOrPhonenumber(user.getName(),user.getPhone_number()).isEmpty())
-                return "username or phone-number already exists!";
-            else {
+        if(!userRepository.existByNameOrPhonenumber(user.getName(),user.getPhone_number()).isEmpty())
+            throw new DuplicateEntryException("username or phonenumber already exist!");
+        else {
+            try{
                 user.setPassword(encoder.encode(user.getPassword()));
                 UserModel newUser = userRepository.save(user);
                 String jwtToken =  jwtService.generateToken(user.getName());
@@ -44,9 +46,9 @@ public class AuthService {
                 saveUserToken(newUser, jwtToken);
                 return jwtToken;
             }
-        }
-        catch (Exception e){
-            return "Registration Failed!";
+            catch (Exception e){
+                return "Registration Failed!";
+            }
         }
     }
 
@@ -61,11 +63,11 @@ public class AuthService {
                 return jwtToken;
             }
             else{
-                return "invalid username or password!";
+                throw new UsernameNotFoundException("invalid username or password!");
             }
         }
         catch (Exception e){
-            return "invalid username or password!";
+            throw new UsernameNotFoundException("invalid username or password!");
         }
     }
 

@@ -6,6 +6,7 @@ import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.TokenRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.apache.tomcat.websocket.AuthenticationException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +35,8 @@ public class AuthServiceTest {
     private TokenRepository tokenRepository;
     @Mock
     private JwtService jwtService;
+    @Mock
+    private PasswordEncoder encoder;
     @Mock
     private Authentication authentication;
     @Mock
@@ -54,10 +58,14 @@ public class AuthServiceTest {
                 .phone_number("0023453213")
                 .build();
 
-        when(userRepository.existByNameOrPhonenumber(user.getName(), user.getPhone_number())).thenReturn(new ArrayList<>());
+        when(userRepository.existByNameOrPhonenumber(user.getName(), user.getPhone_number()))
+                .thenReturn(Collections.emptyList());
+        when(encoder.encode(user.getPassword())).thenReturn("encodedPassword");
+        when(jwtService.generateToken(user.getName())).thenReturn("jwtToken");
+        UserModel savedUser = new UserModel();
+        when(userRepository.save(any(UserModel.class))).thenReturn(savedUser);
 
-        String result = authService.registerUser(user);
-        assertNotNull(result);
+        assertEquals("jwtToken", authService.registerUser(user));
     }
 
     @Test
@@ -96,9 +104,8 @@ public class AuthServiceTest {
         when(userRepository.findByName(authentication.getName())).thenReturn(Optional.ofNullable(user));
         when(jwtService.generateToken(loginRequest.getUsername())).thenReturn("someToken");
 
-        String result = authService.loginUser(loginRequest);
-        assertNotNull(result);}
-
+        assertEquals("someToken", authService.loginUser(loginRequest));
+    }
     @Test
     void testLoginUser_Exception1(){
         LoginRequest loginRequest = new LoginRequest();

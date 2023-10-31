@@ -1,13 +1,14 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Exception.InvalidDataException;
+import com.thinkpalm.ChatApplication.Exception.RoomNotFoundException;
+import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -45,11 +46,9 @@ public class MessageService {
                 messageReceiverModel.setReceiver(receiverUser);
                 messageReceiverModel.setMessage(saveMessage(message));
                 messageReceiverRepository.save(messageReceiverModel);
-
                 return "message send successfully";
-
             }else{
-                return "receiver not found!";
+                throw new UserNotFoundException("No receiver found with Id :"+receiver.getId());
             }
         }
         else if(ReceiverType.ROOM == receiver.getType()){
@@ -59,14 +58,12 @@ public class MessageService {
                 messageRoomModel.setRoom(receiverRoom);
                 messageRoomModel.setMessage(saveMessage(message));
                 messageRoomRepository.save(messageRoomModel);
-
                 return "message send successfully";
-
             }else{
-                return "room not found!";
+                throw new RoomNotFoundException("No room found with Id :"+receiver.getId()) ;
             }
         }else{
-            return "invalid receiverType!";
+            throw new InvalidDataException("invalid receiverType!");
         }
     }
     public MessageModel saveMessage(Message message){
@@ -164,7 +161,7 @@ public class MessageService {
             return messages;
         }
         else{
-            return null;
+            throw new UserNotFoundException("No user with Id : "+otherUserId);
         }
     }
 

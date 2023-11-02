@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Context.UserContextHolder;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class UserService {
     }
 
     public String updateUserBio(Map<String, String> request) {
-        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentUser = UserContextHolder.getContext().getName();
         if(!currentUser.isEmpty()){
             userRepository.updateUserBio(currentUser,request.get("bio"));
             return "Bio updated";
@@ -49,7 +50,7 @@ public class UserService {
     }
 
     public List<Map<String,Object>> getAllChatsOfUsers() {
-        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
         if (currentUser!=null){
             List<Map<String, Object>> users = userRepository.findAllChatsOfUser(currentUser.getId());
             return users;

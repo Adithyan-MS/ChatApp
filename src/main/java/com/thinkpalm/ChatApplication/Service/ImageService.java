@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Context.UserContextHolder;
 import com.thinkpalm.ChatApplication.Model.RoomModel;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.RoomRepository;
@@ -43,7 +44,7 @@ public class ImageService {
             String fileName = formattedDateTime+"_"+multipartFile.getOriginalFilename();
             Path filePath = Paths.get(uploadDirectory, fileName);
 
-            UserModel user = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+            UserModel user = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
             if(user!=null){
                 try(OutputStream outputStream = new FileOutputStream(String.valueOf(filePath))){
                     outputStream.write(multipartFile.getBytes());

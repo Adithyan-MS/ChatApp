@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Context.UserContextHolder;
 import com.thinkpalm.ChatApplication.Exception.InvalidDataException;
 import com.thinkpalm.ChatApplication.Exception.RoomNotFoundException;
 import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
@@ -67,7 +68,7 @@ public class MessageService {
         }
     }
     public MessageModel saveMessage(Message message){
-        Optional<UserModel> sender = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName());
+        Optional<UserModel> sender = userRepository.findByName(UserContextHolder.getContext().getName());
         MessageModel messageModel = new MessageModel();
         messageModel.setContent(message.getContent());
         messageModel.setSender(sender.get());
@@ -82,7 +83,7 @@ public class MessageService {
     }
 
     public String forwardMessage(MessageForwardRequest messageForwardRequest){
-        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
         for(Integer messageId : messageForwardRequest.getMessageIds()){
             MessageModel originalMessage = messageRepository.findById(messageId).orElse(null);
             if(originalMessage != null){
@@ -116,7 +117,7 @@ public class MessageService {
 
     public String editMessage(EditRequest editRequest){
         MessageModel originalMessage = messageRepository.findById(editRequest.getMessageId()).orElse(null);
-        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
         if(originalMessage!=null && currentUser!=null){
             if (Objects.equals(originalMessage.getSender().getId(), currentUser.getId())){
                 MessageHistoryModel messageHistoryModel = new MessageHistoryModel();
@@ -124,7 +125,6 @@ public class MessageService {
                 messageHistoryModel.setEdited_content(originalMessage.getContent());
                 messageHistoryModel.setUser(currentUser);
                 messageHistoryRepository.save(messageHistoryModel);
-
                 originalMessage.setContent(editRequest.getNewContent());
                 messageRepository.save(originalMessage);
                 return "message edited successfully!";
@@ -136,7 +136,7 @@ public class MessageService {
     }
 
     public String deleteMessage(List<Integer> messageIds) {
-        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
         String response = "";
         for (Integer messageId : messageIds){
             MessageModel message = messageRepository.findById(messageId).orElse(null);
@@ -155,7 +155,7 @@ public class MessageService {
 
     public List<Map<String,Object>> getUserChatMessages(Integer otherUserId){
         UserModel otherUserData = userRepository.findById(otherUserId).orElse(null);
-        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
         if(otherUserData != null){
             List<Map<String,Object>> messages = messageReceiverRepository.getAllUserChatMessages(currentUser.getId(), otherUserData.getId());
             return messages;
@@ -166,7 +166,7 @@ public class MessageService {
     }
 
     public List<Map<String,Object>> getRoomChatMessages(Integer roomId){
-        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
         RoomModel roomData = roomRepository.findById(roomId).orElse(null);
         if(roomData != null){
             return messageRoomRepository.getAllRoomChatMessages(roomData.getId(),currentUser.getId());
@@ -176,9 +176,8 @@ public class MessageService {
     }
 
     public String likeOrDislikeMessage(Integer messageId){
-        UserModel currentUser = userRepository.findByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
         MessageModel message = messageRepository.findById(messageId).orElse(null);
-
         if(likeRepository.checkAlreadyLiked(currentUser.getId(), messageId)==0){
             LikeModel likeMessageModel = new LikeModel();
             likeMessageModel.setUser(currentUser);

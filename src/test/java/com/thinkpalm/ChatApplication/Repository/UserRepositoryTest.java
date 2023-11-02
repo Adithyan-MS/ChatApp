@@ -76,7 +76,7 @@ class UserRepositoryTest {
     void updateUserBioTest() {
         userRepository.updateUserBio("aswani","hey everyone!");
         UserModel user = userRepository.findByName("aswani").orElse(null);
-        assertEquals("hey everyone!",user.getBio());
+        assertEquals("hey everyone!", user.getBio());
     }
 
     @Test

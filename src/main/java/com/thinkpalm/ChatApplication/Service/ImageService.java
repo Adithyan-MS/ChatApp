@@ -1,12 +1,11 @@
 package com.thinkpalm.ChatApplication.Service;
 
-import com.thinkpalm.ChatApplication.Context.UserContextHolder;
+import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Model.RoomModel;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.RoomRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,9 +16,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Service
@@ -44,7 +41,7 @@ public class ImageService {
             String fileName = formattedDateTime+"_"+multipartFile.getOriginalFilename();
             Path filePath = Paths.get(uploadDirectory, fileName);
 
-            UserModel user = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+            UserModel user = userRepository.findByName(AppContext.getUserName()).orElse(null);
             if(user!=null){
                 try(OutputStream outputStream = new FileOutputStream(String.valueOf(filePath))){
                     outputStream.write(multipartFile.getBytes());

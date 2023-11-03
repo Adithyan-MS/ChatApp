@@ -1,15 +1,12 @@
 package com.thinkpalm.ChatApplication.Service;
 
-import com.thinkpalm.ChatApplication.Context.UserContextHolder;
+import com.thinkpalm.ChatApplication.Util.AppContext;
+import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -27,17 +24,17 @@ public class UserService {
             user.setPassword(null);
             return user;
         }else{
-            throw new UsernameNotFoundException("User Not Found!");
+            throw new UserNotFoundException("User Not Found!");
         }
     }
 
     public String updateUserBio(Map<String, String> request) {
-        String currentUser = UserContextHolder.getContext().getName();
+        String currentUser = AppContext.getUserName();
         if(!currentUser.isEmpty()){
             userRepository.updateUserBio(currentUser,request.get("bio"));
             return "Bio updated";
         }else{
-            throw new UsernameNotFoundException("User Not Found!");
+            throw new UserNotFoundException("User Not Found!");
         }
     }
 
@@ -50,12 +47,12 @@ public class UserService {
     }
 
     public List<Map<String,Object>> getAllChatsOfUsers() {
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if (currentUser!=null){
             List<Map<String, Object>> users = userRepository.findAllChatsOfUser(currentUser.getId());
             return users;
         }else{
-            throw new UsernameNotFoundException("User Not Found!");
+            throw new UserNotFoundException("User Not Found!");
         }
     }
 }

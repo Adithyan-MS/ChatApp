@@ -1,13 +1,12 @@
 package com.thinkpalm.ChatApplication.Service;
 
-import com.thinkpalm.ChatApplication.Context.UserContextHolder;
+import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Exception.InvalidDataException;
 import com.thinkpalm.ChatApplication.Exception.RoomNotFoundException;
 import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -68,7 +67,7 @@ public class MessageService {
         }
     }
     public MessageModel saveMessage(Message message){
-        Optional<UserModel> sender = userRepository.findByName(UserContextHolder.getContext().getName());
+        Optional<UserModel> sender = userRepository.findByName(AppContext.getUserName());
         MessageModel messageModel = new MessageModel();
         messageModel.setContent(message.getContent());
         messageModel.setSender(sender.get());
@@ -83,7 +82,7 @@ public class MessageService {
     }
 
     public String forwardMessage(MessageForwardRequest messageForwardRequest){
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         for(Integer messageId : messageForwardRequest.getMessageIds()){
             MessageModel originalMessage = messageRepository.findById(messageId).orElse(null);
             if(originalMessage != null){
@@ -117,7 +116,7 @@ public class MessageService {
 
     public String editMessage(EditRequest editRequest){
         MessageModel originalMessage = messageRepository.findById(editRequest.getMessageId()).orElse(null);
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if(originalMessage!=null && currentUser!=null){
             if (Objects.equals(originalMessage.getSender().getId(), currentUser.getId())){
                 MessageHistoryModel messageHistoryModel = new MessageHistoryModel();
@@ -136,7 +135,7 @@ public class MessageService {
     }
 
     public String deleteMessage(List<Integer> messageIds) {
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         String response = "";
         for (Integer messageId : messageIds){
             MessageModel message = messageRepository.findById(messageId).orElse(null);
@@ -155,7 +154,7 @@ public class MessageService {
 
     public List<Map<String,Object>> getUserChatMessages(Integer otherUserId){
         UserModel otherUserData = userRepository.findById(otherUserId).orElse(null);
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if(otherUserData != null){
             List<Map<String,Object>> messages = messageReceiverRepository.getAllUserChatMessages(currentUser.getId(), otherUserData.getId());
             return messages;
@@ -166,7 +165,7 @@ public class MessageService {
     }
 
     public List<Map<String,Object>> getRoomChatMessages(Integer roomId){
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel roomData = roomRepository.findById(roomId).orElse(null);
         if(roomData != null){
             return messageRoomRepository.getAllRoomChatMessages(roomData.getId(),currentUser.getId());
@@ -176,7 +175,7 @@ public class MessageService {
     }
 
     public String likeOrDislikeMessage(Integer messageId){
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         MessageModel message = messageRepository.findById(messageId).orElse(null);
         if(likeRepository.checkAlreadyLiked(currentUser.getId(), messageId)==0){
             LikeModel likeMessageModel = new LikeModel();

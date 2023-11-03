@@ -1,12 +1,10 @@
 package com.thinkpalm.ChatApplication.Filter;
 
-import com.thinkpalm.ChatApplication.Context.UserContextHolder;
-import com.thinkpalm.ChatApplication.Model.Token;
+import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Repository.TokenRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import com.thinkpalm.ChatApplication.Service.JwtService;
 import com.thinkpalm.ChatApplication.Service.UserInfoService;
-import com.thinkpalm.ChatApplication.Service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,13 +49,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                UserContextHolder.setContext(userRepository.findByName(username).orElse(null));
+                AppContext.setUserName(username);
             }
         }
         try{
             filterChain.doFilter(request,response);
         }finally{
-            UserContextHolder.clearContext();
+            AppContext.clearContext();
         }
 
     }

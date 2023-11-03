@@ -1,12 +1,11 @@
 package com.thinkpalm.ChatApplication.Service;
 
-import com.thinkpalm.ChatApplication.Context.UserContextHolder;
+import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.ParticipantModelRepository;
 import com.thinkpalm.ChatApplication.Repository.RoomRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,7 +31,7 @@ public class RoomService {
     }
 
     public String createRoom(CreateRoomRequest createRoomRequest) {
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if (currentUser != null) {
             RoomModel room = new RoomModel();
             room.setName(createRoomRequest.getName());
@@ -67,7 +66,7 @@ public class RoomService {
     }
 
     public String addMember(Integer roomId,List<Integer> memberIds){
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
                 if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
@@ -99,7 +98,7 @@ public class RoomService {
     }
 
     public String removeMember(Integer roomId,List<Integer> memberIds){
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
             if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
@@ -123,7 +122,7 @@ public class RoomService {
     }
 
     public String joinRoom(Integer roomId){
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
             if(participantModelRepository.existsRoomParticipant(roomId,currentUser.getId())==0){
@@ -145,7 +144,7 @@ public class RoomService {
     }
 
     public String exitRoom(Integer roomId){
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
             if(participantModelRepository.isUserAdmin(roomId, currentUser.getId()).orElse(false)){
@@ -166,7 +165,7 @@ public class RoomService {
     }
 
     public String makeRoomAdmin(Integer roomId,Integer otherUserId){
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
             if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
@@ -190,7 +189,7 @@ public class RoomService {
     }
 
     public String dismissRoomAdmin(Integer roomId,Integer otherUserId){
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
             if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
@@ -222,7 +221,7 @@ public class RoomService {
     }
 
     public String uploadPicture(Integer roomId, MultipartFile multipartFile) {
-        UserModel currentUser = userRepository.findByName(UserContextHolder.getContext().getName()).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
             return imageService.uploadPicture(roomId,multipartFile);
         }else{

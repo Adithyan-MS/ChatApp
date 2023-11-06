@@ -3,6 +3,7 @@ package com.thinkpalm.ChatApplication.Config;
 import com.thinkpalm.ChatApplication.Filter.JwtAuthFilter;
 import com.thinkpalm.ChatApplication.Service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,20 +22,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigure {
-
-    private final JwtAuthFilter jwtAuthFilter;
+    @Autowired
+    @Qualifier("handlerExceptionResolver")
+    private HandlerExceptionResolver handlerExceptionResolver;
     private final LogoutHandler logoutHandler;
     @Autowired
-    public SecurityConfigure(JwtAuthFilter jwtAuthFilter, LogoutHandler logoutHandler){
-        this.jwtAuthFilter = jwtAuthFilter;
+    public SecurityConfigure(LogoutHandler logoutHandler){
         this.logoutHandler = logoutHandler;
     }
-
+    @Bean
+    public JwtAuthFilter jwtAuthFilter(){
+        return new JwtAuthFilter(handlerExceptionResolver);
+    }
     @Bean
     public UserDetailsService userDetailsService(){
         return new UserInfoService();
@@ -50,7 +55,7 @@ public class SecurityConfigure {
                 ).httpBasic(Customizer.withDefaults())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
                 .logout(logout->logout
                         .logoutUrl("/chatApi/v1/auth/logout")
                         .addLogoutHandler(logoutHandler)

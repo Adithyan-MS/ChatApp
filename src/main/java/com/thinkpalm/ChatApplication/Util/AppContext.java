@@ -1,15 +1,18 @@
 package com.thinkpalm.ChatApplication.Util;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class AppContext {
     private static String USERNAME = "USERNAME";
-    private static final ThreadLocal<Map<String,String>> appContext = new ThreadLocal<Map<String,String>>();
+    private static ThreadLocal<Map<String, String>> appContext = ThreadLocal.withInitial(HashMap::new);
     public static String getUserName() {
-        return appContext.get().get(USERNAME);
+        Map<String, String> contextMap = appContext.get();
+        return contextMap.get(USERNAME);
     }
     public static void setUserName(String username) {
-        AppContext.getContext().put(USERNAME,username);
+        Map<String, String> contextMap = appContext.get();
+        contextMap.put(USERNAME, username);
     }
     public static void setContext(Map<String,String> context){
         appContext.set(context);

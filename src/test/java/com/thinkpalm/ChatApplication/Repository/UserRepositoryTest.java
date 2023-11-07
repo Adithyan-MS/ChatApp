@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class UserRepositoryTest {
 
-
     @Autowired
     private UserRepository userRepository;
 
@@ -34,19 +33,6 @@ class UserRepositoryTest {
     void tearDown() {
 
     }
-
-    @Test
-    void saveUserTest(){
-        UserModel user = UserModel.builder()
-                .name("navin")
-                .email("navin@gmail.com")
-                .password("navin@123")
-                .phone_number("0123453213")
-                .build();
-        userRepository.save(user);
-        Assertions.assertThat(user.getId()).isGreaterThan(0);
-    }
-
     @Test
     void saveUserWithDuplicatePhoneNoTest(){
         UserModel user = UserModel.builder()

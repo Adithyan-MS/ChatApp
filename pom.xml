@@ -14,7 +14,7 @@
 	<name>ChatApplication</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>20</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -88,6 +88,9 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<finalName>
+			spring-boot-chat-app
+		</finalName>
 	</build>
 
 </project>

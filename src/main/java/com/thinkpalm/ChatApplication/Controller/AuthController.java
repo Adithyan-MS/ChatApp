@@ -25,10 +25,13 @@ public class AuthController {
     public ResponseEntity<Object> userRegister(@RequestBody @Valid UserModel user){
         return new ResponseEntity<>(authService.registerUser(user), HttpStatus.OK);
     }
-
-     @PostMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<String> userLogin(@RequestBody LoginRequest loginRequest){
         return new ResponseEntity<>(authService.loginUser(loginRequest),HttpStatus.OK);
+    }
+    @GetMapping("/logoutSuccess")
+    public ResponseEntity<String> logoutSuccess(){
+        return new ResponseEntity<>("Success:)",HttpStatus.OK);
     }
 
 }

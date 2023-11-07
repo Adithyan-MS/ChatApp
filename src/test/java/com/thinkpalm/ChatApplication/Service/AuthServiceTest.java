@@ -1,6 +1,7 @@
 package com.thinkpalm.ChatApplication.Service;
 
 import com.thinkpalm.ChatApplication.Exception.DuplicateEntryException;
+import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Model.LoginRequest;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.TokenRepository;
@@ -118,7 +119,7 @@ public class AuthServiceTest {
         try {
             authService.loginUser(loginRequest);
             fail("Expected UsernameNotFoundException");
-        } catch (UsernameNotFoundException e) {
+        } catch (UserNotFoundException e) {
             assertEquals("invalid username or password!", e.getMessage());
         }
     }
@@ -134,7 +135,7 @@ public class AuthServiceTest {
         try {
             authService.loginUser(loginRequest);
             fail("Expected UsernameNotFoundException");
-        } catch (UsernameNotFoundException e) {
+        } catch (UserNotFoundException e) {
             assertEquals("invalid username or password!", e.getMessage());
         }
     }

@@ -1,5 +1,7 @@
 package com.thinkpalm.ChatApplication.Filter;
 
+import com.thinkpalm.ChatApplication.Exception.DuplicateEntryException;
+import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Repository.TokenRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 

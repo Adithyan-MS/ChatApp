@@ -89,7 +89,7 @@
 			</plugin>
 		</plugins>
 		<finalName>
-			spring-boot-chat-app
+			spring-chatApp
 		</finalName>
 	</build>
 

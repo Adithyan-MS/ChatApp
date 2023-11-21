@@ -4,6 +4,7 @@ package com.thinkpalm.ChatApplication.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thinkpalm.ChatApplication.Validation.EmailValid;
 import com.thinkpalm.ChatApplication.Validation.NameValid;
+import com.thinkpalm.ChatApplication.Validation.PasswordValid;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -32,7 +33,7 @@ public class UserModel extends Auditable{
     @Column
     @NotNull
     @NotEmpty
-    @Size(min = 5)
+    @PasswordValid
     private String password;
 
     @Column

@@ -15,7 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AuthService {
@@ -34,7 +36,7 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public String registerUser(UserModel user){
+    public Object registerUser(UserModel user){
         if(!userRepository.existByNameOrPhonenumber(user.getName(),user.getPhone_number()).isEmpty())
             throw new DuplicateEntryException("username or phonenumber already exist!");
         else {
@@ -44,7 +46,9 @@ public class AuthService {
                 String jwtToken =  jwtService.generateToken(user.getName());
                 revokeAllUserTokens(newUser);
                 saveUserToken(newUser, jwtToken);
-                return jwtToken;
+                Map<String,String> res = new HashMap<>();
+                res.put("token",jwtToken);
+                return res;
             }
             catch (Exception e){
                 return "Registration Failed!";
@@ -52,7 +56,7 @@ public class AuthService {
         }
     }
 
-    public String loginUser(LoginRequest loginRequest) {
+    public Map<String,String> loginUser(LoginRequest loginRequest) {
         try{
             Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             if (authenticate.isAuthenticated()){
@@ -60,7 +64,9 @@ public class AuthService {
                 String jwtToken = jwtService.generateToken(loginRequest.getUsername());
                 revokeAllUserTokens(loggedInUser);
                 saveUserToken(loggedInUser,jwtToken);
-                return jwtToken;
+                Map<String,String> res = new HashMap<>();
+                res.put("token",jwtToken);
+                return res;
             }
             else{
                 throw new UserNotFoundException("invalid username or password!");

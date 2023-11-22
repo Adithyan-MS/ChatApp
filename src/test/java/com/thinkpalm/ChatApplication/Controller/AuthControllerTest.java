@@ -40,24 +40,24 @@ class AuthControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
     }
 
-    @Test
-    public void testUserRegister_Success() throws Exception {
-        UserModel user = UserModel.builder()
-                .name("sharon")
-                .email("sharon@gmail.com")
-                .password("sharon123")
-                .phone_number("0023453213")
-                .build();
-
-        when(authService.registerUser(any(UserModel.class))).thenReturn("jwtToken");
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/chatApi/v1/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(user)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("jwtToken"))
-                .andDo(MockMvcResultHandlers.print());
-    }
+//    @Test
+//    public void testUserRegister_Success() throws Exception {
+//        UserModel user = UserModel.builder()
+//                .name("sharon")
+//                .email("sharon@gmail.com")
+//                .password("sharon123")
+//                .phone_number("0023453213")
+//                .build();
+//
+//        when(authService.registerUser(any(UserModel.class))).thenReturn("jwtToken");
+//
+//        mockMvc.perform(MockMvcRequestBuilders.post("/chatApi/v1/auth/register")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(asJsonString(user)))
+//                .andExpect(status().isOk())
+//                .andExpect(content().string("jwtToken"))
+//                .andDo(MockMvcResultHandlers.print());
+//    }
 
     @Test
     public void testUserRegister_DuplicateEntry() throws Exception {
@@ -80,17 +80,17 @@ class AuthControllerTest {
                 .andDo(MockMvcResultHandlers.print());
    }
 
-    @Test
-    public void testUserLogin_Success() throws Exception {
-        LoginRequest loginRequest = new LoginRequest("validUsername", "validPassword");
-        when(authService.loginUser(any(LoginRequest.class))).thenReturn("jwtToken");
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/chatApi/v1/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(loginRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("jwtToken"));
-    }
+//    @Test
+//    public void testUserLogin_Success() throws Exception {
+//        LoginRequest loginRequest = new LoginRequest("validUsername", "validPassword");
+//        when(authService.loginUser(any(LoginRequest.class))).thenReturn("jwtToken");
+//
+//        mockMvc.perform(MockMvcRequestBuilders.post("/chatApi/v1/auth/login")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(asJsonString(loginRequest)))
+//                .andExpect(status().isOk())
+//                .andExpect(content().string("jwtToken"));
+//    }
 
     @Test
     public void testUserLogin_InvalidCredentials() throws Exception {

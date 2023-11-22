@@ -10,8 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
+
 @RequestMapping("/chatApi/v1/auth")
+
 public class AuthController {
 
     private final AuthService authService;
@@ -26,7 +30,7 @@ public class AuthController {
         return new ResponseEntity<>(authService.registerUser(user), HttpStatus.OK);
     }
     @PostMapping("/login")
-    public ResponseEntity<String> userLogin(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<Map<String,String>> userLogin(@RequestBody LoginRequest loginRequest){
         return new ResponseEntity<>(authService.loginUser(loginRequest),HttpStatus.OK);
     }
     @GetMapping("/logoutSuccess")

@@ -38,7 +38,7 @@ public class AuthService {
 
     public Object registerUser(UserModel user){
         if(!userRepository.existByNameOrPhonenumber(user.getName(),user.getPhone_number()).isEmpty())
-            throw new DuplicateEntryException("username or phonenumber already exist!");
+            throw new DuplicateEntryException("Username or Phonenumber already exist!");
         else {
             try{
                 user.setPassword(encoder.encode(user.getPassword()));
@@ -69,11 +69,11 @@ public class AuthService {
                 return res;
             }
             else{
-                throw new UserNotFoundException("invalid username or password!");
+                throw new UserNotFoundException("Invalid Username or Password!");
             }
         }
         catch (Exception e){
-            throw new UserNotFoundException("invalid username or password!");
+            throw new UserNotFoundException("Invalid Username or Password!");
         }
     }
 

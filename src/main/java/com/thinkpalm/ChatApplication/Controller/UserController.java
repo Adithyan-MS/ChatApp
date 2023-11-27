@@ -16,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("chatApi/v1/user")
+@CrossOrigin("*")
 public class UserController {
 
     private final UserService userService;
@@ -33,6 +34,7 @@ public class UserController {
 
     @GetMapping("/{username}")
     public ResponseEntity<UserModel> getUserDetails(@PathVariable String username){
+        System.out.println("hai daa==========");
         return new ResponseEntity<>(userService.getUserDetails(username), HttpStatus.OK);
     }
 

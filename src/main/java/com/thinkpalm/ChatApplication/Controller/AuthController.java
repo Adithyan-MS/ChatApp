@@ -15,7 +15,6 @@ import java.util.Map;
 @RestController
 
 @RequestMapping("/chatApi/v1/auth")
-
 public class AuthController {
 
     private final AuthService authService;

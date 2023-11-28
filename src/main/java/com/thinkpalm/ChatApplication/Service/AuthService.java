@@ -43,7 +43,7 @@ public class AuthService {
             try{
                 user.setPassword(encoder.encode(user.getPassword()));
                 UserModel newUser = userRepository.save(user);
-                String jwtToken =  jwtService.generateToken(user.getName());
+                String jwtToken =  jwtService.generateToken(newUser.getName());
                 revokeAllUserTokens(newUser);
                 saveUserToken(newUser, jwtToken);
                 Map<String,String> res = new HashMap<>();
@@ -61,7 +61,7 @@ public class AuthService {
             Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             if (authenticate.isAuthenticated()){
                 UserModel loggedInUser = userRepository.findByName(authenticate.getName()).orElse(null);
-                String jwtToken = jwtService.generateToken(loginRequest.getUsername());
+                String jwtToken = jwtService.generateToken(loggedInUser.getName());
                 revokeAllUserTokens(loggedInUser);
                 saveUserToken(loggedInUser,jwtToken);
                 Map<String,String> res = new HashMap<>();

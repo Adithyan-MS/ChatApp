@@ -22,9 +22,10 @@ public interface MessageReceiverRepository extends JpaRepository<MessageReceiver
 
 
     //new
-    @Query(value = "SELECT m.id, m.content, m.sender_id, m.parent_message_id, m.like_count, m.created_at, m.modified_at\n" +
+    @Query(value = "SELECT m.id, m.content, m.sender_id, u.name as sender_name, m.parent_message_id, m.like_count, m.created_at, m.modified_at\n" +
             "FROM message AS m\n" +
             "JOIN message_receiver AS mr ON m.id = mr.message_id\n" +
+            "JOIN user AS u ON m.sender_id = u.id\n" +
             "LEFT JOIN deleted_message AS dm ON m.id = dm.message_id AND dm.deleted_by = ?1\n" +
             "WHERE \n" +
             "    ((m.sender_id = ?1 AND mr.receiver_id = ?2) OR (m.sender_id = ?2 AND mr.receiver_id = ?1))\n" +

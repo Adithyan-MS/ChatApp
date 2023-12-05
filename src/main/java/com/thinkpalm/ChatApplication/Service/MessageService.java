@@ -39,7 +39,7 @@ public class MessageService {
     public String sendMessage(MessageSendRequest messageSendRequest){
         Message message = messageSendRequest.getMessage();
         Receiver receiver = messageSendRequest.getReceiver();
-        if(ReceiverType.USER == receiver.getType()){
+        if(ReceiverType.user == receiver.getType()){
             UserModel receiverUser = userRepository.findById(receiver.getId()).orElse(null);
             if(receiverUser != null){
                 MessageReceiverModel messageReceiverModel = new MessageReceiverModel();
@@ -51,7 +51,7 @@ public class MessageService {
                 throw new UserNotFoundException("No receiver found with Id :"+receiver.getId());
             }
         }
-        else if(ReceiverType.ROOM == receiver.getType()){
+        else if(ReceiverType.user == receiver.getType()){
             RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
             if(receiverRoom != null){
                 MessageRoomModel messageRoomModel = new MessageRoomModel();
@@ -91,7 +91,7 @@ public class MessageService {
                 newMessage.setSender(currentUser);
                 messageRepository.save(newMessage);
                 for(Receiver receiver : messageForwardRequest.getReceivers()){
-                    if(ReceiverType.USER == receiver.getType()){
+                    if(ReceiverType.user == receiver.getType()){
                         UserModel receiverUser = userRepository.findById(receiver.getId()).orElse(null);
                         if(receiverUser != null){
                             MessageReceiverModel messageReceiver = new MessageReceiverModel();
@@ -99,7 +99,7 @@ public class MessageService {
                             messageReceiver.setMessage(newMessage);
                             messageReceiverRepository.save(messageReceiver);
                         }
-                    }else if(ReceiverType.ROOM == receiver.getType()){
+                    }else if(ReceiverType.user == receiver.getType()){
                         RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
                         if(receiverRoom != null){
                             MessageRoomModel messageRoom = new MessageRoomModel();

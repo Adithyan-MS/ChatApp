@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "    FROM chatdb.message_receiver as mr1\n" +
             "    INNER JOIN chatdb.message as m ON m.id = mr1.message_id\n" +
             "    INNER JOIN chatdb.user as u ON u.id = mr1.receiver_id\n" +
-            "    WHERE mr1.receiver_id = ?1 or m.sender_id = ?1\n" +
+            "    WHERE m.sender_id = ?1\n" +
             "    GROUP BY u.id, u.name, u.profile_pic\n" +
             "    UNION\n" +
             "    SELECT r.id, r.name, r.room_pic, 'room' as type, max(mr2.modified_at) as modified_at\n" +

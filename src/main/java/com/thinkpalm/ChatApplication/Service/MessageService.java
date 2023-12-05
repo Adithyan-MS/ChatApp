@@ -51,7 +51,7 @@ public class MessageService {
                 throw new UserNotFoundException("No receiver found with Id :"+receiver.getId());
             }
         }
-        else if(ReceiverType.user == receiver.getType()){
+        else if(ReceiverType.room == receiver.getType()){
             RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
             if(receiverRoom != null){
                 MessageRoomModel messageRoomModel = new MessageRoomModel();
@@ -99,7 +99,7 @@ public class MessageService {
                             messageReceiver.setMessage(newMessage);
                             messageReceiverRepository.save(messageReceiver);
                         }
-                    }else if(ReceiverType.user == receiver.getType()){
+                    }else if(ReceiverType.room == receiver.getType()){
                         RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
                         if(receiverRoom != null){
                             MessageRoomModel messageRoom = new MessageRoomModel();

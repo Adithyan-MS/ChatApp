@@ -43,8 +43,8 @@ public class UserController {
         return new ResponseEntity<>(userService.getAllChatsOfUsers(),HttpStatus.OK);
     }
     @GetMapping("/search")
-    public ResponseEntity<List<Map<String,Object>>> searchChats(@RequestParam("query") String query){
-        return new ResponseEntity<>(userService.searchChats(query),HttpStatus.OK);
+    public ResponseEntity<List<Map<String,Object>>> searchChats(@RequestParam("name") String searchName){
+        return new ResponseEntity<>(userService.searchChats(searchName),HttpStatus.OK);
     }
 
     @PostMapping("/updateUserBio")

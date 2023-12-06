@@ -60,8 +60,13 @@ public class UserService {
         }
     }
 
-    public List<Map<String, Object>> searchChats(String query) {
-        List<Map<String, Object>> result  =  userRepository.searchChats(query);
-        return result;
+    public List<Map<String, Object>> searchChats(String searchName) {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        if (currentUser!=null){
+            List<Map<String, Object>> result  =  userRepository.searchChats(currentUser.getId(), searchName);
+            return result;
+        }else{
+            throw new UserNotFoundException("User Not Found!");
+        }
     }
 }

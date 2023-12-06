@@ -42,4 +42,6 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
     @Query(value = "select * from user where name = ?1 or phone_number = ?2",nativeQuery = true)
     List<UserModel> existByNameOrPhonenumber(String name, String phoneNumber);
 
+    @Query(value = "select * from user where name LIKE CONCAT('%',:query,'%')",nativeQuery = true)
+    List<Map<String, Object>> searchChats(String query);
 }

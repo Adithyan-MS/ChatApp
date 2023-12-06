@@ -59,4 +59,9 @@ public class UserService {
             throw new UserNotFoundException("User Not Found!");
         }
     }
+
+    public List<Map<String, Object>> searchChats(String query) {
+        List<Map<String, Object>> result  =  userRepository.searchChats(query);
+        return result;
+    }
 }

@@ -1,6 +1,7 @@
 package com.thinkpalm.ChatApplication.Controller;
 
 import com.thinkpalm.ChatApplication.Model.CreateRoomRequest;
+import com.thinkpalm.ChatApplication.Model.RoomModel;
 import com.thinkpalm.ChatApplication.Service.ImageService;
 import com.thinkpalm.ChatApplication.Service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,11 @@ public class RoomController {
     @PostMapping("/{roomId}/uploadRoomPicture")
     public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile){
         return new ResponseEntity<>(roomService.uploadPicture(roomId,multipartFile), HttpStatus.OK);
+    }
+
+    @GetMapping("/{roomName}")
+    public  ResponseEntity<RoomModel> getroomDetails(@PathVariable String roomName){
+        return new ResponseEntity<>(roomService.getRoomDetails(roomName),HttpStatus.OK);
     }
 
 }

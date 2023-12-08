@@ -1,11 +1,13 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Exception.RoomNotFoundException;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.ParticipantModelRepository;
 import com.thinkpalm.ChatApplication.Repository.RoomRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -226,6 +228,14 @@ public class RoomService {
             return imageService.uploadPicture(roomId,multipartFile);
         }else{
             return "You are not an Admin!";
+        }
+    }
+    public RoomModel getRoomDetails(String roomName) {
+        RoomModel room = roomRepository.findByName(roomName);
+        if(room!=null){
+            return room;
+        }else{
+            throw new RoomNotFoundException("Room Not Found!");
         }
     }
 }

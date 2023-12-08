@@ -31,7 +31,7 @@ public interface ParticipantModelRepository extends JpaRepository<ParticipantMod
     @Query(value = "update participant set is_admin = false where room_id = ?1 and user_id = ?2",nativeQuery = true)
     int dismissRoomAdmin(Integer roomId, Integer otherUserId);
 
-    @Query(value = "SELECT u.id, u.name, u.profile_pic, p.is_admin\n" +
+    @Query(value = "SELECT u.id, u.name, u.bio, u.profile_pic, p.is_admin\n" +
             "FROM participant AS p\n" +
             "INNER JOIN user AS u ON p.user_id = u.id\n" +
             "WHERE p.room_id = ? AND p.is_active = true\n" +

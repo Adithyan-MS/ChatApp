@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Controller;
 
+import com.thinkpalm.ChatApplication.Model.RoomModel;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Service.ImageService;
 import com.thinkpalm.ChatApplication.Service.UserService;
@@ -61,6 +62,10 @@ public class UserController {
     public ResponseEntity<byte[]> viewImage(@PathVariable String filename) throws IOException {
         String contentType = determineContentType(filename);
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(imageService.viewImage(filename));
+    }
+    @GetMapping("/{otherUserName}/commonRooms")
+    public ResponseEntity<List<Map<String, Object>>> getCommonRooms(@PathVariable String otherUserName){
+        return new ResponseEntity<>(userService.getCommonRooms(otherUserName),HttpStatus.OK);
     }
 
     private String determineContentType(String filename) {

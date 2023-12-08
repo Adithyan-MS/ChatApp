@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Model.RoomModel;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Model.UserModel;
@@ -67,6 +68,16 @@ public class UserService {
             return result;
         }else{
             throw new UserNotFoundException("User Not Found!");
+        }
+    }
+
+    public List<Map<String, Object>> getCommonRooms(String otherUserName) {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        UserModel otherUser = userRepository.findByName(otherUserName).orElse(null);
+        if(otherUser!=null){
+            return userRepository.getCommonRooms(currentUser.getId(),otherUser.getId());
+        }else {
+            throw new UserNotFoundException("Can't find this user!");
         }
     }
 }

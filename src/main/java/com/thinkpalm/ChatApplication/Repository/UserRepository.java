@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Repository;
 
+import com.thinkpalm.ChatApplication.Model.RoomModel;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -92,4 +93,12 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "\t\t\tGROUP BY id, name, profile_pic, type\n" +
             "\t\t\tORDER BY max_modified_at DESC",nativeQuery = true)
     List<Map<String, Object>> searchChats(Integer currentUserId,String searchName);
+
+    @Query(value = "SELECT r.*\n" +
+            "FROM chatdb.room r\n" +
+            "JOIN chatdb.participant p ON r.id = p.room_id\n" +
+            "WHERE p.user_id = ?1 OR p.user_id = ?2\n" +
+            "GROUP BY r.id\n" +
+            "HAVING COUNT(DISTINCT p.user_id) = 2",nativeQuery = true)
+    List<Map<String, Object>> getCommonRooms(Integer id, Integer id1);
 }

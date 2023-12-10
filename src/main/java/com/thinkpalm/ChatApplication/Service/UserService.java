@@ -37,7 +37,7 @@ public class UserService {
         String currentUser = AppContext.getUserName();
         if(!currentUser.isEmpty()){
             userRepository.updateUserBio(currentUser,request.get("bio"));
-            return "Bio updated";
+            return request.get("bio");
         }else{
             throw new UserNotFoundException("User Not Found!");
         }

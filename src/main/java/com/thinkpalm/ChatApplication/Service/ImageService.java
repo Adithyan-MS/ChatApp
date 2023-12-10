@@ -53,7 +53,7 @@ public class ImageService {
                     throw new RuntimeException(e);
                 }
             }
-            return fileName + " uploaded";
+            return fileName;
         }else{
             return "file not found!";
         }
@@ -80,7 +80,7 @@ public class ImageService {
                     throw new RuntimeException(e);
                 }
             }
-            return fileName + " uploaded";
+            return fileName;
         }else{
             return "file not found!";
         }

@@ -17,7 +17,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("chatApi/v1/user")
-@CrossOrigin("*")
 public class UserController {
 
     private final UserService userService;
@@ -35,7 +34,6 @@ public class UserController {
 
     @GetMapping("/{username}")
     public ResponseEntity<UserModel> getUserDetails(@PathVariable String username){
-        System.out.println("hai daa==========");
         return new ResponseEntity<>(userService.getUserDetails(username), HttpStatus.OK);
     }
 
@@ -48,12 +46,12 @@ public class UserController {
         return new ResponseEntity<>(userService.searchChats(searchName),HttpStatus.OK);
     }
 
-    @PostMapping("/updateUserBio")
+    @PostMapping("/update/bio")
     public ResponseEntity<String> updateUserBio(@RequestBody Map<String,String> request){
         return new ResponseEntity<>(userService.updateUserBio(request),HttpStatus.OK);
     }
 
-    @PostMapping("/uploadUserPicture")
+    @PostMapping("/update/picture")
     public ResponseEntity<String> uploadProfilePic(@RequestParam("file") MultipartFile multipartFile) throws IOException {
         return new ResponseEntity<>(imageService.uploadPicture(multipartFile),HttpStatus.OK);
     }

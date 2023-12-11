@@ -71,6 +71,16 @@ public class UserService {
         }
     }
 
+    public List<Map<String, Object>> searchUsers(String searchName) {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        if (currentUser!=null){
+            List<Map<String, Object>> result  =  userRepository.searchUsers(searchName);
+            return result;
+        }else{
+            throw new UserNotFoundException("User Not Found!");
+        }
+    }
+
     public List<Map<String, Object>> getCommonRooms(String otherUserName) {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         UserModel otherUser = userRepository.findByName(otherUserName).orElse(null);
@@ -80,4 +90,6 @@ public class UserService {
             throw new UserNotFoundException("Can't find this user!");
         }
     }
+
+
 }

@@ -102,6 +102,6 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "HAVING COUNT(DISTINCT p.user_id) = 2",nativeQuery = true)
     List<Map<String, Object>> getCommonRooms(Integer id, Integer id1);
 
-    @Query(value = "SELECT * FROM chatdb.user where user.name LIKE CONCAT('%',?1,'%')",nativeQuery = true)
-    List<Map<String, Object>> searchUsers(String searchName);
+    @Query(value = "SELECT * FROM chatdb.user where user.name LIKE CONCAT('%',?1,'%') && user.id != ?2",nativeQuery = true)
+    List<Map<String, Object>> searchUsers(String searchName,Integer currentUserId);
 }

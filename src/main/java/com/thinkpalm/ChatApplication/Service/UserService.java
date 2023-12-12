@@ -74,7 +74,7 @@ public class UserService {
     public List<Map<String, Object>> searchUsers(String searchName) {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if (currentUser!=null){
-            List<Map<String, Object>> result  =  userRepository.searchUsers(searchName);
+            List<Map<String, Object>> result  =  userRepository.searchUsers(searchName,currentUser.getId());
             return result;
         }else{
             throw new UserNotFoundException("User Not Found!");

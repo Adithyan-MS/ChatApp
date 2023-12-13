@@ -20,11 +20,9 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
-    private final ImageService imageService;
     @Autowired
-    public UserController(UserService userService,ImageService imageService){
+    public UserController(UserService userService){
         this.userService = userService;
-        this.imageService = imageService;
     }
 
     @GetMapping("/all")
@@ -55,31 +53,9 @@ public class UserController {
         return new ResponseEntity<>(userService.updateUserBio(request),HttpStatus.OK);
     }
 
-    @PostMapping("/update/picture")
-    public ResponseEntity<String> uploadProfilePic(@RequestParam("file") MultipartFile multipartFile) throws IOException {
-        return new ResponseEntity<>(imageService.uploadPicture(multipartFile),HttpStatus.OK);
-    }
-
-    @GetMapping("/image/{filename}")
-    public ResponseEntity<byte[]> viewImage(@PathVariable String filename) throws IOException {
-        String contentType = determineContentType(filename);
-        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(imageService.viewImage(filename));
-    }
     @GetMapping("/{otherUserName}/commonRooms")
     public ResponseEntity<List<Map<String, Object>>> getCommonRooms(@PathVariable String otherUserName){
         return new ResponseEntity<>(userService.getCommonRooms(otherUserName),HttpStatus.OK);
-    }
-
-    private String determineContentType(String filename) {
-        if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
-            return "image/jpeg";
-        } else if (filename.endsWith(".png")) {
-            return "image/png";
-        } else if (filename.endsWith(".gif")) {
-            return "image/gif";
-        } else {
-            return "application/octet-stream";
-        }
     }
 
 

@@ -28,7 +28,7 @@ public class RoomController {
     }
 
     @PostMapping("/createRoom")
-    public ResponseEntity<String> createRoom(@RequestBody CreateRoomRequest createRoomRequest){
+    public ResponseEntity<RoomModel> createRoom(@RequestBody CreateRoomRequest createRoomRequest){
         return new ResponseEntity<>(roomService.createRoom(createRoomRequest),HttpStatus.OK);
     }
 
@@ -70,11 +70,6 @@ public class RoomController {
     @GetMapping("/{roomId}/pastParticipants")
     public ResponseEntity<List<Map<String, Object>>> getPastRoomParticipants(@PathVariable Integer roomId){
         return new ResponseEntity<>(roomService.getPastRoomParticipants(roomId),HttpStatus.OK);
-    }
-
-    @PostMapping("/{roomId}/uploadRoomPicture")
-    public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile){
-        return new ResponseEntity<>(roomService.uploadPicture(roomId,multipartFile), HttpStatus.OK);
     }
 
     @GetMapping("/{roomName}")

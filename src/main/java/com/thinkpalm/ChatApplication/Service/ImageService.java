@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Repository.ParticipantModelRepository;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Model.RoomModel;
 import com.thinkpalm.ChatApplication.Model.UserModel;
@@ -27,10 +28,12 @@ public class ImageService {
 
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final ParticipantModelRepository participantModelRepository;
 
-    public ImageService(UserRepository userRepository,RoomRepository roomRepository){
+    public ImageService(UserRepository userRepository, RoomRepository roomRepository, ParticipantModelRepository participantModelRepository){
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
+        this.participantModelRepository = participantModelRepository;
     }
 
     public String uploadPicture(MultipartFile multipartFile) throws IOException {
@@ -61,29 +64,35 @@ public class ImageService {
     }
 
     public String uploadPicture(Integer roomId,MultipartFile multipartFile) {
-        if(!multipartFile.isEmpty()){
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-            String formattedDateTime = dateFormat.format(new Date());
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
+            if(!multipartFile.isEmpty()){
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                String formattedDateTime = dateFormat.format(new Date());
 
-            String fileName = formattedDateTime+"_"+multipartFile.getOriginalFilename();
-            Path filePath = Paths.get(uploadDirectory, fileName);
-            RoomModel room = roomRepository.findById(roomId).orElse(null);
-            if(room!=null){
-                try(OutputStream outputStream = new FileOutputStream(String.valueOf(filePath))){
-                    outputStream.write(multipartFile.getBytes());
+                String fileName = formattedDateTime+"_"+multipartFile.getOriginalFilename();
+                Path filePath = Paths.get(uploadDirectory, fileName);
+                RoomModel room = roomRepository.findById(roomId).orElse(null);
+                if(room!=null){
+                    try(OutputStream outputStream = new FileOutputStream(String.valueOf(filePath))){
+                        outputStream.write(multipartFile.getBytes());
 
-                    room.setRoom_pic(fileName);
-                    roomRepository.save(room);
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                        room.setRoom_pic(fileName);
+                        roomRepository.save(room);
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
+                return fileName;
+            }else{
+                return "file not found!";
             }
-            return fileName;
         }else{
-            return "file not found!";
+            return "You are not an Admin!";
         }
+
     }
     public byte[] viewImage(String filename) throws IOException {
         String filePath = uploadDirectory +"/"+ filename;

@@ -1,6 +1,8 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Exception.DuplicateEntryException;
 import com.thinkpalm.ChatApplication.Exception.RoomNotFoundException;
+import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.ParticipantModelRepository;
@@ -32,38 +34,42 @@ public class RoomService {
         this.imageService = imageService;
     }
 
-    public String createRoom(CreateRoomRequest createRoomRequest) {
+    public RoomModel createRoom(CreateRoomRequest createRoomRequest) {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if (currentUser != null) {
-            RoomModel room = new RoomModel();
-            room.setName(createRoomRequest.getName());
-            room.setDescription(createRoomRequest.getDesc());
-            room.setRoom_pic(createRoomRequest.getPic());
-            roomRepository.save(room);
+            if(!roomRepository.existByRoomName(createRoomRequest.getName()).isEmpty()){
+                throw new DuplicateEntryException("Room name already exist!");
+            }else{
+                RoomModel room = new RoomModel();
+                room.setName(createRoomRequest.getName());
+                room.setDescription(createRoomRequest.getDesc());
+                room.setRoom_pic(createRoomRequest.getPic());
+                roomRepository.save(room);
 
-            ParticipantModel participantModel = new ParticipantModel();
-            participantModel.setRoom(room);
-            participantModel.setUser(currentUser);
-            participantModel.setIs_admin(true);
-            participantModel.setIs_active(true);
-            participantModel.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
-            participantModelRepository.save(participantModel);
+                ParticipantModel participantModel = new ParticipantModel();
+                participantModel.setRoom(room);
+                participantModel.setUser(currentUser);
+                participantModel.setIs_admin(true);
+                participantModel.setIs_active(true);
+                participantModel.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
+                participantModelRepository.save(participantModel);
 
-            for (Integer participant : createRoomRequest.getParticipants()) {
-                UserModel user = userRepository.findById(participant).orElse(null);
-                if (user != null) {
-                    ParticipantModel participantModel1 = new ParticipantModel();
-                    participantModel1.setRoom(room);
-                    participantModel1.setUser(user);
-                    participantModel1.setIs_admin(false);
-                    participantModel1.setIs_active(true);
-                    participantModel1.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
-                    participantModelRepository.save(participantModel1);
+                for (Integer participant : createRoomRequest.getParticipants()) {
+                    UserModel user = userRepository.findById(participant).orElse(null);
+                    if (user != null) {
+                        ParticipantModel participantModel1 = new ParticipantModel();
+                        participantModel1.setRoom(room);
+                        participantModel1.setUser(user);
+                        participantModel1.setIs_admin(false);
+                        participantModel1.setIs_active(true);
+                        participantModel1.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
+                        participantModelRepository.save(participantModel1);
+                    }
                 }
+                return room;
             }
-            return "room created!";
         }else{
-            return "can't create room!";
+            throw new UserNotFoundException("User not Found!");
         }
     }
 
@@ -222,14 +228,6 @@ public class RoomService {
         return participantModelRepository.getPastRoomParticipants(roomId);
     }
 
-    public String uploadPicture(Integer roomId, MultipartFile multipartFile) {
-        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
-        if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
-            return imageService.uploadPicture(roomId,multipartFile);
-        }else{
-            return "You are not an Admin!";
-        }
-    }
     public RoomModel getRoomDetails(String roomName) {
         RoomModel room = roomRepository.findByName(roomName);
         if(room!=null){

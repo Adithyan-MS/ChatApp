@@ -143,11 +143,11 @@ public class RoomService {
                 participantModelRepository.save(participant);
                 return "user joined.";
             }else{
-                return "user is already a member!";
+                throw new DuplicateEntryException("You are already a member!");
             }
         }
         else{
-            return "No such room!";
+            throw new RoomNotFoundException("Room not found!");
         }
     }
 

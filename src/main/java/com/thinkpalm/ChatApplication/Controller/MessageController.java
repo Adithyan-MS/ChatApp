@@ -2,6 +2,7 @@ package com.thinkpalm.ChatApplication.Controller;
 
 import com.thinkpalm.ChatApplication.Model.EditRequest;
 import com.thinkpalm.ChatApplication.Model.MessageForwardRequest;
+import com.thinkpalm.ChatApplication.Model.MessageModel;
 import com.thinkpalm.ChatApplication.Model.MessageSendRequest;
 import com.thinkpalm.ChatApplication.Service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,11 +55,11 @@ public class MessageController {
     }
 
     @PostMapping("/like/{messageId}")
-    public ResponseEntity<String> likeOrDislikeMessage(@PathVariable Integer messageId){
+    public ResponseEntity<Integer> likeOrDislikeMessage(@PathVariable Integer messageId){
         return new ResponseEntity<>(messageService.likeOrDislikeMessage(messageId),HttpStatus.OK);
     }
 
-    @GetMapping("/likes/users/{messageId}")
+    @GetMapping("/likes/{messageId}")
     public ResponseEntity<List<Map<String,Object>>> getMessageLikedUsers(@PathVariable Integer messageId){
         return new ResponseEntity<>(messageService.getMessageLikedUsers(messageId),HttpStatus.OK);
     }

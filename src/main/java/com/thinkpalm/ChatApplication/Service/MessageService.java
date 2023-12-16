@@ -174,7 +174,7 @@ public class MessageService {
         }
     }
 
-    public String likeOrDislikeMessage(Integer messageId){
+    public Integer likeOrDislikeMessage(Integer messageId){
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         MessageModel message = messageRepository.findById(messageId).orElse(null);
         if(likeRepository.checkAlreadyLiked(currentUser.getId(), messageId)==0){
@@ -183,11 +183,11 @@ public class MessageService {
             likeMessageModel.setMessage(message);
             likeRepository.save(likeMessageModel);
             updateLikeCount(message);
-            return "message liked";
+            return message.getLike_count();
         }else{
             likeRepository.deleteLiked(currentUser.getId(),messageId);
             updateLikeCount(message);
-            return "message unliked";
+            return message.getLike_count();
         }
     }
 

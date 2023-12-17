@@ -1,6 +1,7 @@
 package com.thinkpalm.ChatApplication.Service;
 
 import com.thinkpalm.ChatApplication.Exception.DuplicateEntryException;
+import com.thinkpalm.ChatApplication.Exception.InvalidDataException;
 import com.thinkpalm.ChatApplication.Exception.RoomNotFoundException;
 import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Util.AppContext;
@@ -73,7 +74,7 @@ public class RoomService {
         }
     }
 
-    public String addMember(Integer roomId,List<Integer> memberIds){
+    public String addMember(Integer roomId,List<Integer> memberIds) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
@@ -82,14 +83,25 @@ public class RoomService {
                     for (Integer memberId : memberIds){
                         UserModel user = userRepository.findById(memberId).orElse(null);
                         if(user!=null){
-                            ParticipantModel participant = new ParticipantModel();
-                            participant.setRoom(room);
-                            participant.setUser(user);
-                            participant.setIs_admin(false);
-                            participant.setIs_active(true);
-                            participant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
-                            participantModelRepository.save(participant);
-                            response = response + "\n" + "User "+memberId+" successfully added.";
+                            ParticipantModel participant = participantModelRepository.findByRoomAndUser(roomId,memberId).orElse(null);
+                            if(participant!=null){
+                                if(participant.getIs_active()){
+                                    throw new DuplicateEntryException("You are already a member!");
+                                }else{
+                                    participant.setIs_active(true);
+                                    participantModelRepository.save(participant);
+                                    return "user joined.";
+                                }
+                            }else{
+                                ParticipantModel newParticipant = new ParticipantModel();
+                                newParticipant.setUser(currentUser);
+                                newParticipant.setRoom(room);
+                                newParticipant.setIs_admin(false);
+                                newParticipant.setIs_active(true);
+                                newParticipant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
+                                participantModelRepository.save(newParticipant);
+                                response = response + "\n" + "User "+memberId+" successfully added.";
+                            }
                         }else{
                             response = response + "\n" + "User "+memberId+" is invalid User!";
                         }
@@ -97,15 +109,15 @@ public class RoomService {
                     return response;
                 }
                 else {
-                    return "User is not an admin!";
+                    throw new IllegalAccessException("You are not an Admin!");
                 }
         }
         else{
-            return "No such room!";
+            throw new RoomNotFoundException("Room Not Found!");
         }
     }
 
-    public String removeMember(Integer roomId,List<Integer> memberIds){
+    public String removeMember(Integer roomId,List<Integer> memberIds) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
@@ -121,11 +133,11 @@ public class RoomService {
                 }
                 return response;
             }else{
-                return "You are not an Admin!";
+                throw new IllegalAccessException("You are not an Admin!");
             }
         }
         else{
-            return "No such room!";
+            throw new RoomNotFoundException("Room Not Found!");
         }
     }
 
@@ -133,17 +145,24 @@ public class RoomService {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
-            if(participantModelRepository.existsRoomParticipant(roomId,currentUser.getId())==0){
-                ParticipantModel participant = new ParticipantModel();
-                participant.setUser(currentUser);
-                participant.setRoom(room);
-                participant.setIs_admin(false);
-                participant.setIs_active(true);
-                participant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
-                participantModelRepository.save(participant);
-                return "user joined.";
+            ParticipantModel participant = participantModelRepository.findByRoomAndUser(roomId,currentUser.getId()).orElse(null);
+            if(participant!=null){
+                if(participant.getIs_active()){
+                    throw new DuplicateEntryException("You are already a member!");
+                }else{
+                    participant.setIs_active(true);
+                    participantModelRepository.save(participant);
+                    return "user joined.";
+                }
             }else{
-                throw new DuplicateEntryException("You are already a member!");
+                ParticipantModel newParticipant = new ParticipantModel();
+                newParticipant.setUser(currentUser);
+                newParticipant.setRoom(room);
+                newParticipant.setIs_admin(false);
+                newParticipant.setIs_active(true);
+                newParticipant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
+                participantModelRepository.save(newParticipant);
+                return "user joined.";
             }
         }
         else{
@@ -151,7 +170,7 @@ public class RoomService {
         }
     }
 
-    public String exitRoom(Integer roomId){
+    public String exitRoom(Integer roomId) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
@@ -160,7 +179,7 @@ public class RoomService {
                     participantModelRepository.deactivateParticipant(roomId, currentUser.getId(),Timestamp.valueOf(LocalDateTime.now()));
                     return "user exited from room.";
                 }else{
-                    return "Can't exit, you are the only admin!";
+                    throw new IllegalAccessException("Can't exit, you are the only admin!");
                 }
             }else{
                 participantModelRepository.deactivateParticipant(roomId, currentUser.getId(), Timestamp.valueOf(LocalDateTime.now()));
@@ -168,11 +187,11 @@ public class RoomService {
             }
         }
         else{
-            return "No such room!";
+            throw new RoomNotFoundException("Room Not Found");
         }
     }
 
-    public String makeRoomAdmin(Integer roomId,Integer otherUserId){
+    public String makeRoomAdmin(Integer roomId,Integer otherUserId) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
@@ -181,22 +200,22 @@ public class RoomService {
                     if(participantModelRepository.makeRoomAdmin(roomId,otherUserId)>0){
                         return "User " + otherUserId + " is now an Admin";
                     }else{
-                        return "User " + otherUserId + " can't be an Admin!";
+                        throw new InvalidDataException("User " + otherUserId + " can't be an Admin");
                     }
                 }else{
-                    return "User " + otherUserId + " is already an Admin!";
+                    throw new InvalidDataException("User " + otherUserId + " is already an Admin!");
                 }
             }
             else {
-                return "You are not an admin!";
+                throw new IllegalAccessException("You are not an Admin!");
             }
         }
         else{
-            return "No such room!";
+            throw new RoomNotFoundException("Room Not Found");
         }
     }
 
-    public String dismissRoomAdmin(Integer roomId,Integer otherUserId){
+    public String dismissRoomAdmin(Integer roomId,Integer otherUserId) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
@@ -205,18 +224,18 @@ public class RoomService {
                     if(participantModelRepository.dismissRoomAdmin(roomId,otherUserId)>0){
                         return "User " + otherUserId + " is successfully dismissed as Admin";
                     }else{
-                        return "User " + otherUserId + " can't be dismissed as Admin!";
+                        throw new InvalidDataException("User " + otherUserId + " can't be dismissed as Admin!");
                     }
                 }else{
-                    return "User " + otherUserId + " is not an Admin!";
+                    throw new InvalidDataException("User " + otherUserId + " is not an Admin!");
                 }
             }
             else {
-                return "You are not an admin!";
+                throw new IllegalAccessException("You are not an Admin!");
             }
         }
         else{
-            return "No such room!";
+            throw new RoomNotFoundException("Room Not Found");
         }
     }
 

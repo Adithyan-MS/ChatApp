@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Exception.InvalidDataException;
 import com.thinkpalm.ChatApplication.Repository.ParticipantModelRepository;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Model.RoomModel;
@@ -63,7 +64,7 @@ public class ImageService {
 
     }
 
-    public String uploadPicture(Integer roomId,MultipartFile multipartFile) {
+    public String uploadPicture(Integer roomId,MultipartFile multipartFile) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
             if(!multipartFile.isEmpty()){
@@ -87,10 +88,10 @@ public class ImageService {
                 }
                 return fileName;
             }else{
-                return "file not found!";
+                throw new InvalidDataException("File not found!");
             }
         }else{
-            return "You are not an Admin!";
+            throw new IllegalAccessException("You are not an Admin!");
         }
 
     }

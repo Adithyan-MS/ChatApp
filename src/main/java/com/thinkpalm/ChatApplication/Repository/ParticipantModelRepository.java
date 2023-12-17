@@ -13,8 +13,9 @@ import java.util.Optional;
 
 public interface ParticipantModelRepository extends JpaRepository<ParticipantModel,Integer> {
 
-    @Query(value = "select count(*) from participant where room_id = ?1 and user_id = ?2",nativeQuery = true)
+    @Query(value = "select count(*) from participant where room_id = ?1 and user_id = ?2  and is_active = true",nativeQuery = true)
     Integer existsRoomParticipant(Integer roomId, Integer userid);
+
     @Query(value = "select is_admin from participant where room_id = ?1 and user_id = ?2",nativeQuery = true)
     Optional<Boolean> isUserAdmin(Integer roomId, Integer userid);
 
@@ -58,6 +59,8 @@ public interface ParticipantModelRepository extends JpaRepository<ParticipantMod
     @Query(value = "update participant set is_active = false,left_at = ?3 where room_id = ?1 and user_id = ?2",nativeQuery = true)
     void deactivateParticipant(Integer roomId, Integer memberId, Timestamp timestamp);
 
+    @Query(value = "select * from participant where room_id = ?1 and user_id = ?2",nativeQuery = true)
+    Optional<ParticipantModel> findByRoomAndUser(Integer roomId, Integer id);
 }
 
 

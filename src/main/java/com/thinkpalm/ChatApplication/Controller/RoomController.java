@@ -33,12 +33,12 @@ public class RoomController {
     }
 
     @PostMapping("/{roomId}/addMember")
-    public ResponseEntity<String> addMember(@PathVariable Integer roomId, @RequestBody Map<String,List<Integer>> request){
+    public ResponseEntity<String> addMember(@PathVariable Integer roomId, @RequestBody Map<String,List<Integer>> request) throws IllegalAccessException {
         return new ResponseEntity<>(roomService.addMember(roomId,request.get("members")),HttpStatus.OK);
     }
 
     @PostMapping("/{roomId}/removeMember")
-    public ResponseEntity<String> removeMember(@PathVariable Integer roomId, @RequestBody Map<String,List<Integer>> request){
+    public ResponseEntity<String> removeMember(@PathVariable Integer roomId, @RequestBody Map<String,List<Integer>> request) throws IllegalAccessException {
         return new ResponseEntity<>(roomService.removeMember(roomId,request.get("members")),HttpStatus.OK);
     }
 
@@ -48,17 +48,17 @@ public class RoomController {
     }
 
     @PostMapping("/{roomId}/exitRoom")
-    public ResponseEntity<String> exitRoom(@PathVariable Integer roomId){
+    public ResponseEntity<String> exitRoom(@PathVariable Integer roomId) throws IllegalAccessException {
         return new ResponseEntity<>(roomService.exitRoom(roomId),HttpStatus.OK);
     }
 
     @PostMapping("/{roomId}/makeRoomAdmin/{otherUserId}")
-    public ResponseEntity<String> makeRoomAdmin(@PathVariable Integer roomId,@PathVariable Integer otherUserId){
+    public ResponseEntity<String> makeRoomAdmin(@PathVariable Integer roomId,@PathVariable Integer otherUserId) throws IllegalAccessException {
         return new ResponseEntity<>(roomService.makeRoomAdmin(roomId,otherUserId),HttpStatus.OK);
     }
 
     @PostMapping("/{roomId}/dismissRoomAdmin/{otherUserId}")
-    public ResponseEntity<String> dismissRoomAdmin(@PathVariable Integer roomId,@PathVariable Integer otherUserId){
+    public ResponseEntity<String> dismissRoomAdmin(@PathVariable Integer roomId,@PathVariable Integer otherUserId) throws IllegalAccessException {
         return new ResponseEntity<>(roomService.dismissRoomAdmin(roomId,otherUserId),HttpStatus.OK);
     }
 

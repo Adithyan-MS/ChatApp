@@ -27,7 +27,7 @@ public class ImageController {
         return new ResponseEntity<>(imageService.uploadPicture(multipartFile), HttpStatus.OK);
     }
     @PostMapping("/upload/{roomId}")
-    public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile){
+    public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile) throws IllegalAccessException {
         return new ResponseEntity<>(imageService.uploadPicture(roomId,multipartFile), HttpStatus.OK);
     }
     @GetMapping("/view/{filename}")

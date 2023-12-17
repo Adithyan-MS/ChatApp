@@ -112,4 +112,17 @@ public class GlobalExceptionHandler {
         errorResponse.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
         return errorResponse;
     }
+
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ExceptionHandler(IllegalAccessException.class)
+    public ErrorResponse handleIllegalAccessException(IllegalAccessException ex){
+        String error = "IllegalAccessException";
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setStatus(HttpStatus.SERVICE_UNAVAILABLE);
+        errorResponse.setCode(HttpStatus.SERVICE_UNAVAILABLE.value());
+        errorResponse.setError(error);
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+        return errorResponse;
+    }
 }

@@ -114,7 +114,7 @@ public class MessageService {
         return "message forwarded successfully";
     }
 
-    public String editMessage(EditRequest editRequest){
+    public String editMessage(EditRequest editRequest) throws IllegalAccessException {
         MessageModel originalMessage = messageRepository.findById(editRequest.getMessageId()).orElse(null);
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if(originalMessage!=null && currentUser!=null){
@@ -128,10 +128,11 @@ public class MessageService {
                 messageRepository.save(originalMessage);
                 return "message edited successfully!";
             }else{
-                return "this user can't edit this message";
+                throw new IllegalAccessException("this user can't edit this message");
             }
+        }else{
+            throw new UserNotFoundException("User or Message not Found!");
         }
-        return null;
     }
 
     public String deleteMessage(List<Integer> messageIds) {

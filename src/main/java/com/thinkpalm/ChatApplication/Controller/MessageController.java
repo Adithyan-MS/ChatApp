@@ -35,7 +35,7 @@ public class MessageController {
     }
 
     @PostMapping("/editMessage")
-    public ResponseEntity<String> editMessage(@RequestBody EditRequest editRequest){
+    public ResponseEntity<String> editMessage(@RequestBody EditRequest editRequest) throws IllegalAccessException {
         return new ResponseEntity<>(messageService.editMessage(editRequest),HttpStatus.OK);
     }
 

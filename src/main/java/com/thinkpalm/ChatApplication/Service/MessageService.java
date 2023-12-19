@@ -23,9 +23,10 @@ public class MessageService {
     private final LikeRepository likeRepository;
     private final MessageHistoryRepository messageHistoryRepository;
     private final DeletedMessageRepository deletedMessageRepository;
+    private final StarredMessageRepository starredMessageRepository;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageReceiverRepository messageReceiverRepository, RoomRepository roomRepository, MessageRoomRepository messageRoomRepository, LikeRepository likeRepository, MessageHistoryRepository messageHistoryRepository, DeletedMessageRepository deletedMessageRepository){
+    public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageReceiverRepository messageReceiverRepository, RoomRepository roomRepository, MessageRoomRepository messageRoomRepository, LikeRepository likeRepository, MessageHistoryRepository messageHistoryRepository, DeletedMessageRepository deletedMessageRepository, StarredMessageRepository starredMessageRepository){
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.messageReceiverRepository = messageReceiverRepository;
@@ -34,6 +35,7 @@ public class MessageService {
         this.likeRepository = likeRepository;
         this.messageHistoryRepository = messageHistoryRepository;
         this.deletedMessageRepository = deletedMessageRepository;
+        this.starredMessageRepository = starredMessageRepository;
     }
 
     public String sendMessage(MessageSendRequest messageSendRequest){
@@ -202,4 +204,39 @@ public class MessageService {
         return likeRepository.getMessageLikedUsers(message_id);
     }
 
+    public List<Map<String, Object>> searchUserChatMessage(Integer otherUserId, String searchContent) {
+        UserModel otherUserData = userRepository.findById(otherUserId).orElse(null);
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        if(otherUserData != null){
+            List<Map<String,Object>> messages = messageReceiverRepository.searchUserChatMessages(currentUser.getId(), otherUserData.getId(),searchContent);
+            return messages;
+        }
+        else{
+            throw new UserNotFoundException("No user with Id : "+otherUserId);
+        }
+    }
+
+    public List<Map<String, Object>> searchRoomChatMessage(Integer roomId, String searchContent) {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        RoomModel roomData = roomRepository.findById(roomId).orElse(null);
+        if(roomData != null){
+            return messageRoomRepository.searchUserChatMessages(roomData.getId(),currentUser.getId(),searchContent);
+        }else {
+            return null;
+        }
+    }
+    public String starOrUnstarMessage(Integer messageId) {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        MessageModel message = messageRepository.findById(messageId).orElse(null);
+        if(starredMessageRepository.checkAlreadyStarred(currentUser.getId(), messageId)==0){
+            StarredMessageModel starredMessageModel = new StarredMessageModel();
+            starredMessageModel.setUser(currentUser);
+            starredMessageModel.setMessage(message);
+            starredMessageRepository.save(starredMessageModel);
+            return "starred";
+        }else{
+            starredMessageRepository.deleteLiked(currentUser.getId(),messageId);
+            return "unstarred";
+        }
+    }
 }

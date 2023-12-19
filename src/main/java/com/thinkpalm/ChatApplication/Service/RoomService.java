@@ -94,7 +94,7 @@ public class RoomService {
                                 }
                             }else{
                                 ParticipantModel newParticipant = new ParticipantModel();
-                                newParticipant.setUser(currentUser);
+                                newParticipant.setUser(user);
                                 newParticipant.setRoom(room);
                                 newParticipant.setIs_admin(false);
                                 newParticipant.setIs_active(true);

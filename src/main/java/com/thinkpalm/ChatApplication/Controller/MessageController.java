@@ -33,10 +33,14 @@ public class MessageController {
     public ResponseEntity<String> forwardMessage(@RequestBody MessageForwardRequest msg){
         return new ResponseEntity<>(messageService.forwardMessage(msg),HttpStatus.OK);
     }
-
     @PostMapping("/editMessage")
     public ResponseEntity<String> editMessage(@RequestBody EditRequest editRequest) throws IllegalAccessException {
         return new ResponseEntity<>(messageService.editMessage(editRequest),HttpStatus.OK);
+    }
+
+    @PostMapping("/starOrUnstarMessage/{messageId}")
+    public ResponseEntity<String> starOrUnstarMessage(@PathVariable Integer messageId) {
+        return new ResponseEntity<>(messageService.starOrUnstarMessage(messageId),HttpStatus.OK);
     }
 
     @PostMapping("/deleteMessage")
@@ -49,9 +53,19 @@ public class MessageController {
         return new ResponseEntity<>(messageService.getUserChatMessages(otherUserId),HttpStatus.OK);
     }
 
+    @GetMapping("/user/{otherUserId}/search")
+    public ResponseEntity<List<Map<String,Object>>> searchUserChats(@RequestParam("value") String searchContent,@PathVariable Integer otherUserId){
+        return new ResponseEntity<>(messageService.searchUserChatMessage(otherUserId,searchContent),HttpStatus.OK);
+    }
+
     @GetMapping("/room/{roomId}")
     public ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable Integer roomId){
         return new ResponseEntity<>(messageService.getRoomChatMessages(roomId), HttpStatus.OK);
+    }
+
+    @GetMapping("/room/{roomId}/search")
+    public ResponseEntity<List<Map<String,Object>>> searchRoomChats(@RequestParam("value") String searchContent,@PathVariable Integer roomId){
+        return new ResponseEntity<>(messageService.searchRoomChatMessage(roomId,searchContent),HttpStatus.OK);
     }
 
     @PostMapping("/like/{messageId}")

@@ -17,12 +17,6 @@ import java.util.stream.Collectors;
 
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
-
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        WebMvcConfigurer.super.addCorsMappings(registry);
-//    }
-
     @Bean
     public CorsFilter corsFilter() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

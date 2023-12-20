@@ -93,7 +93,6 @@ public class ImageService {
         }else{
             throw new IllegalAccessException("You are not an Admin!");
         }
-
     }
     public byte[] viewImage(String filename) throws IOException {
         String filePath = uploadDirectory +"/"+ filename;

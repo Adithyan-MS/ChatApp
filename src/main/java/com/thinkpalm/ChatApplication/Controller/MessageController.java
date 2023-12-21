@@ -58,6 +58,11 @@ public class MessageController {
         return new ResponseEntity<>(messageService.searchUserChatMessage(otherUserId,searchContent),HttpStatus.OK);
     }
 
+    @GetMapping("/forward/search")
+    public ResponseEntity<List<Map<String,Object>>> searchAllChats(@RequestParam("value") String searchContent){
+        return new ResponseEntity<>(messageService.searchAllChats(searchContent),HttpStatus.OK);
+    }
+
     @GetMapping("/room/{roomId}")
     public ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable Integer roomId){
         return new ResponseEntity<>(messageService.getRoomChatMessages(roomId), HttpStatus.OK);

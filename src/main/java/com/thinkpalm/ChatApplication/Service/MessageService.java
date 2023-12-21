@@ -239,4 +239,13 @@ public class MessageService {
             return "unstarred";
         }
     }
+
+    public List<Map<String, Object>> searchAllChats(String searchContent) {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        if(!searchContent.isEmpty()) {
+            return messageRoomRepository.searchAllChats(searchContent, currentUser.getId());
+        }else {
+            throw  new InvalidDataException("No search content");
+        }
+    }
 }

@@ -31,4 +31,11 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,In
             "            AND m.content LIKE CONCAT('%',?3,'%')\n" +
             "            ORDER BY m.created_at",nativeQuery = true)
     List<Map<String, Object>> searchUserChatMessages(Integer id, Integer id1, String searchContent);
+
+    @Query(value = "SELECT u.id as id, u.name as name, u.profile_pic as profile_pic, 'user' as type\n" +
+            "\t\t\tFROM chatdb.user as u  where name LIKE CONCAT('%',?1,'%') and id != ?2\n" +
+            "            UNION\n" +
+            "\t\t\tSELECT r.id as id, r.name as name, r.room_pic as profile_pic, 'room' as type\n" +
+            "            FROM chatdb.room as r where name LIKE CONCAT('%',?1,'%');",nativeQuery = true)
+    List<Map<String, Object>> searchAllChats(String searchContent, Integer id);
 }

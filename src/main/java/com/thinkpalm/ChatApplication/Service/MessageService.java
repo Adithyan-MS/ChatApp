@@ -20,59 +20,69 @@ public class MessageService {
     private final MessageReceiverRepository messageReceiverRepository;
     private final RoomRepository roomRepository;
     private final MessageRoomRepository messageRoomRepository;
+    private final ParticipantModelRepository participantModelRepository;
     private final LikeRepository likeRepository;
     private final MessageHistoryRepository messageHistoryRepository;
     private final DeletedMessageRepository deletedMessageRepository;
     private final StarredMessageRepository starredMessageRepository;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageReceiverRepository messageReceiverRepository, RoomRepository roomRepository, MessageRoomRepository messageRoomRepository, LikeRepository likeRepository, MessageHistoryRepository messageHistoryRepository, DeletedMessageRepository deletedMessageRepository, StarredMessageRepository starredMessageRepository){
+    public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageReceiverRepository messageReceiverRepository, RoomRepository roomRepository, MessageRoomRepository messageRoomRepository, ParticipantModelRepository participantModelRepository, LikeRepository likeRepository, MessageHistoryRepository messageHistoryRepository, DeletedMessageRepository deletedMessageRepository, StarredMessageRepository starredMessageRepository){
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.messageReceiverRepository = messageReceiverRepository;
         this.roomRepository = roomRepository;
         this.messageRoomRepository = messageRoomRepository;
+        this.participantModelRepository = participantModelRepository;
         this.likeRepository = likeRepository;
         this.messageHistoryRepository = messageHistoryRepository;
         this.deletedMessageRepository = deletedMessageRepository;
         this.starredMessageRepository = starredMessageRepository;
     }
 
-    public String sendMessage(MessageSendRequest messageSendRequest){
-        Message message = messageSendRequest.getMessage();
-        Receiver receiver = messageSendRequest.getReceiver();
-        if(ReceiverType.user == receiver.getType()){
-            UserModel receiverUser = userRepository.findById(receiver.getId()).orElse(null);
-            if(receiverUser != null){
-                MessageReceiverModel messageReceiverModel = new MessageReceiverModel();
-                messageReceiverModel.setReceiver(receiverUser);
-                messageReceiverModel.setMessage(saveMessage(message));
-                messageReceiverRepository.save(messageReceiverModel);
-                return "message send successfully";
-            }else{
-                throw new UserNotFoundException("No receiver found with Id :"+receiver.getId());
+    public String sendMessage(MessageSendRequest messageSendRequest) throws IllegalAccessException {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        if(currentUser!=null){
+            Message message = messageSendRequest.getMessage();
+            Receiver receiver = messageSendRequest.getReceiver();
+            if(ReceiverType.user == receiver.getType()){
+                UserModel receiverUser = userRepository.findById(receiver.getId()).orElse(null);
+                if(receiverUser != null){
+                    MessageReceiverModel messageReceiverModel = new MessageReceiverModel();
+                    messageReceiverModel.setReceiver(receiverUser);
+                    messageReceiverModel.setMessage(saveMessage(message,currentUser));
+                    messageReceiverRepository.save(messageReceiverModel);
+                    return "message send successfully";
+                }else{
+                    throw new UserNotFoundException("No receiver found with Id :"+receiver.getId());
+                }
             }
-        }
-        else if(ReceiverType.room == receiver.getType()){
-            RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
-            if(receiverRoom != null){
-                MessageRoomModel messageRoomModel = new MessageRoomModel();
-                messageRoomModel.setRoom(receiverRoom);
-                messageRoomModel.setMessage(saveMessage(message));
-                messageRoomRepository.save(messageRoomModel);
-                return "message send successfully";
+            else if(ReceiverType.room == receiver.getType()){
+                RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
+                if(receiverRoom != null){
+                    if(participantModelRepository.existsRoomParticipant(receiverRoom.getId(), currentUser.getId())!=0){
+                        MessageRoomModel messageRoomModel = new MessageRoomModel();
+                        messageRoomModel.setRoom(receiverRoom);
+                        messageRoomModel.setMessage(saveMessage(message,currentUser));
+                        messageRoomRepository.save(messageRoomModel);
+                        return "message send successfully";
+                    }else{
+                        throw new IllegalAccessException("You are not a room member!");
+                    }
+                }else{
+                    throw new RoomNotFoundException("No room found with Id :"+receiver.getId()) ;
+                }
             }else{
-                throw new RoomNotFoundException("No room found with Id :"+receiver.getId()) ;
+                throw new InvalidDataException("invalid receiverType!");
             }
-        }else{
-            throw new InvalidDataException("invalid receiverType!");
+        }else {
+            throw new UserNotFoundException("User not found!");
         }
     }
-    public MessageModel saveMessage(Message message){
-        Optional<UserModel> sender = userRepository.findByName(AppContext.getUserName());
+    public MessageModel saveMessage(Message message,UserModel sender){
         MessageModel messageModel = new MessageModel();
         messageModel.setContent(message.getContent());
-        messageModel.setSender(sender.get());
+        messageModel.setSender(sender);
         if(message.getParentMessage() != null){
             MessageModel parentMessage = messageRepository.findById(message.getParentMessage()).orElse(null);
             if(parentMessage != null){
@@ -104,10 +114,12 @@ public class MessageService {
                     }else if(ReceiverType.room == receiver.getType()){
                         RoomModel receiverRoom = roomRepository.findById(receiver.getId()).orElse(null);
                         if(receiverRoom != null){
-                            MessageRoomModel messageRoom = new MessageRoomModel();
-                            messageRoom.setRoom(receiverRoom);
-                            messageRoom.setMessage(newMessage);
-                            messageRoomRepository.save(messageRoom);
+                            if(participantModelRepository.existsRoomParticipant(receiverRoom.getId(), currentUser.getId())!=0) {
+                                MessageRoomModel messageRoom = new MessageRoomModel();
+                                messageRoom.setRoom(receiverRoom);
+                                messageRoom.setMessage(newMessage);
+                                messageRoomRepository.save(messageRoom);
+                            }
                         }
                     }
                 }
@@ -167,13 +179,22 @@ public class MessageService {
         }
     }
 
-    public List<Map<String,Object>> getRoomChatMessages(Integer roomId){
+    public List<Map<String,Object>> getRoomChatMessages(Integer roomId) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel roomData = roomRepository.findById(roomId).orElse(null);
         if(roomData != null){
-            return messageRoomRepository.getAllRoomChatMessages(roomData.getId(),currentUser.getId());
+            ParticipantModel participant = participantModelRepository.findByRoomAndUser(roomId,currentUser.getId()).orElse(null);
+            if(participant!=null){
+                if(participant.getIs_active()){
+                    return messageRoomRepository.getParticipantMessages(roomData.getId(),currentUser.getId());
+                }else{
+                    return messageRoomRepository.getPastParticipantMessages(roomId, currentUser.getId(), String.valueOf(participant.getLeft_at()));
+                }
+            }else {
+                throw new IllegalAccessException("You are not a member to this room!");
+            }
         }else {
-            return null;
+            throw new RoomNotFoundException("Room not found!");
         }
     }
 

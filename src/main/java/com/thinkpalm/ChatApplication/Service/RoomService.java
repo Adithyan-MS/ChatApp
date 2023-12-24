@@ -255,4 +255,22 @@ public class RoomService {
             throw new RoomNotFoundException("Room Not Found!");
         }
     }
+
+    public Boolean IsUserPartcicpant(Integer roomId, Integer userId) {
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if(room!=null){
+            UserModel user = userRepository.findById(userId).orElse(null);
+            if(user!=null){
+                if(participantModelRepository.existsRoomParticipant(roomId,userId)!=0){
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                throw new UserNotFoundException("User not found!");
+            }
+        }else{
+            throw new RoomNotFoundException("Room not found!");
+        }
+    }
 }

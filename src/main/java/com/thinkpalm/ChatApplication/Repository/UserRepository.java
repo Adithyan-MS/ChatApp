@@ -85,9 +85,6 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "                UNION\n" +
             "\t\t\t\tSELECT u.id, u.name, u.profile_pic, 'user' as type, null as modified_at\n" +
             "\t\t\t\tFROM chatdb.user as u\n" +
-            "\t\t\t\tUNION\n" +
-            "\t\t\t\tSELECT r.id, r.name, r.room_pic, 'room' as type, null as modified_at\n" +
-            "\t\t\t\tFROM chatdb.room as r\n" +
             "            ) AS combined_results\n" +
             "\t\t\twhere name LIKE CONCAT('%',?2,'%')\n" +
             "\t\t\tGROUP BY id, name, profile_pic, type\n" +

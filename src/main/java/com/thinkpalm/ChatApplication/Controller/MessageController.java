@@ -25,7 +25,7 @@ public class MessageController {
     }
 
     @PostMapping("/sendMessage")
-    public ResponseEntity<String> sendMessage(@RequestBody MessageSendRequest msg){
+    public ResponseEntity<String> sendMessage(@RequestBody MessageSendRequest msg) throws IllegalAccessException {
         return new ResponseEntity<>(messageService.sendMessage(msg),HttpStatus.OK);
     }
 
@@ -64,7 +64,7 @@ public class MessageController {
     }
 
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable Integer roomId){
+    public ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable Integer roomId) throws IllegalAccessException {
         return new ResponseEntity<>(messageService.getRoomChatMessages(roomId), HttpStatus.OK);
     }
 

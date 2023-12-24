@@ -62,6 +62,11 @@ public class RoomController {
         return new ResponseEntity<>(roomService.dismissRoomAdmin(roomId,otherUserId),HttpStatus.OK);
     }
 
+    @GetMapping("/{roomId}/isParticipant/{userId}")
+    public ResponseEntity<Boolean> IsUserPartcicpant(@PathVariable Integer roomId,@PathVariable Integer userId){
+        return new ResponseEntity<>(roomService.IsUserPartcicpant(roomId,userId),HttpStatus.OK);
+    }
+
     @GetMapping("/{roomId}/participants")
     public ResponseEntity<List<Map<String, Object>>> getRoomPartcicpants(@PathVariable Integer roomId){
         return new ResponseEntity<>(roomService.getRoomParticipants(roomId),HttpStatus.OK);

@@ -36,12 +36,12 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "            WHERE mr1.receiver_id = ?1\n" +
             "            GROUP BY u.id, u.name, u.profile_pic\n" +
             "            UNION\n" +
-            "            SELECT r.id, r.name, r.room_pic, 'room' as type, max(mr2.modified_at) as modified_at\n" +
+            "            SELECT r.id,r.name, r.room_pic, 'room' as type,CASE WHEN p.left_at IS NOT NULL THEN p.left_at ELSE MAX(mr2.modified_at) END as timestamp\n" +
             "            FROM chatdb.message_room as mr2\n" +
             "            INNER JOIN chatdb.room as r ON r.id = mr2.room_id\n" +
             "            INNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
             "            WHERE p.user_id = ?1\n" +
-            "            GROUP BY r.id, r.name, r.room_pic\n" +
+            "            GROUP BY r.id, r.name, r.room_pic, p.left_at\n" +
             "            UNION\n" +
             "            SELECT r.id, r.name, r.room_pic, 'room' as type, r.created_at as modified_at\n" +
             "            FROM chatdb.room as r\n" +
@@ -71,13 +71,13 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "\t\t\t\tWHERE mr1.receiver_id = ?1\n" +
             "\t\t\t\tGROUP BY u.id, u.name, u.profile_pic\n" +
             "\t\t\t\tUNION\n" +
-            "\t\t\t\tSELECT r.id, r.name, r.room_pic, 'room' as type, max(mr2.modified_at) as modified_at\n" +
-            "\t\t\t    FROM chatdb.message_room as mr2\n" +
-            "\t\t\t\tINNER JOIN chatdb.room as r ON r.id = mr2.room_id\n" +
-            "\t\t\t\tINNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
-            "\t\t\t\tWHERE p.user_id = ?1\n" +
-            "\t\t\t\tGROUP BY r.id, r.name, r.room_pic\n" +
-            "\t\t\t\tUNION\n" +
+            "        SELECT r.id,r.name, r.room_pic, 'room' as type,CASE WHEN p.left_at IS NOT NULL THEN p.left_at ELSE MAX(mr2.modified_at) END as timestamp\n" +
+            "        FROM chatdb.message_room as mr2\n" +
+            "        INNER JOIN chatdb.room as r ON r.id = mr2.room_id\n" +
+            "        INNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
+            "        WHERE p.user_id = ?1\n" +
+            "        GROUP BY r.id, r.name, r.room_pic, p.left_at\n" +
+            "        UNION\n" +
             "\t\t\t\tSELECT r.id, r.name, r.room_pic, 'room' as type, r.created_at as modified_at\n" +
             "\t\t\t\tFROM chatdb.room as r\n" +
             "\t\t\t\tINNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +

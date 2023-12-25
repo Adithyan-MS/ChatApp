@@ -89,6 +89,8 @@ public class RoomService {
                                     throw new DuplicateEntryException("You are already a member!");
                                 }else{
                                     participant.setIs_active(true);
+                                    participant.setLeft_at(null);
+                                    participant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
                                     participantModelRepository.save(participant);
                                     return "user joined.";
                                 }
@@ -151,6 +153,8 @@ public class RoomService {
                     throw new DuplicateEntryException("You are already a member!");
                 }else{
                     participant.setIs_active(true);
+                    participant.setLeft_at(null);
+                    participant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
                     participantModelRepository.save(participant);
                     return "user joined.";
                 }

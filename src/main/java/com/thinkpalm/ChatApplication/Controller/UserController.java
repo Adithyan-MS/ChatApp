@@ -58,5 +58,4 @@ public class UserController {
         return new ResponseEntity<>(userService.getCommonRooms(otherUserName),HttpStatus.OK);
     }
 
-
 }

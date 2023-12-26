@@ -183,16 +183,7 @@ public class MessageService {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel roomData = roomRepository.findById(roomId).orElse(null);
         if(roomData != null){
-            ParticipantModel participant = participantModelRepository.findByRoomAndUser(roomId,currentUser.getId()).orElse(null);
-            if(participant!=null){
-                if(participant.getIs_active()){
-                    return messageRoomRepository.getParticipantMessages(roomData.getId(),currentUser.getId());
-                }else{
-                    return messageRoomRepository.getPastParticipantMessages(roomId, currentUser.getId(), String.valueOf(participant.getLeft_at()));
-                }
-            }else {
-                throw new IllegalAccessException("You are not a member to this room!");
-            }
+            return messageRoomRepository.getAllRoomMessages(roomData.getId(),currentUser.getId());
         }else {
             throw new RoomNotFoundException("Room not found!");
         }
@@ -246,19 +237,23 @@ public class MessageService {
             return null;
         }
     }
-    public String starOrUnstarMessage(Integer messageId) {
+    public String starOrUnstarMessage(List<Integer> messageIds) {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
-        MessageModel message = messageRepository.findById(messageId).orElse(null);
-        if(starredMessageRepository.checkAlreadyStarred(currentUser.getId(), messageId)==0){
-            StarredMessageModel starredMessageModel = new StarredMessageModel();
-            starredMessageModel.setUser(currentUser);
-            starredMessageModel.setMessage(message);
-            starredMessageRepository.save(starredMessageModel);
-            return "starred";
-        }else{
-            starredMessageRepository.deleteLiked(currentUser.getId(),messageId);
-            return "unstarred";
+        String response = "";
+        for (Integer messageId : messageIds){
+            MessageModel message = messageRepository.findById(messageId).orElse(null);
+            if(starredMessageRepository.checkAlreadyStarred(currentUser.getId(), messageId)==0){
+                StarredMessageModel starredMessageModel = new StarredMessageModel();
+                starredMessageModel.setUser(currentUser);
+                starredMessageModel.setMessage(message);
+                starredMessageRepository.save(starredMessageModel);
+                return "starred";
+            }else{
+                starredMessageRepository.deleteLiked(currentUser.getId(),messageId);
+                return "unstarred";
+            }
         }
+        return response;
     }
 
     public List<Map<String, Object>> searchAllChats(String searchContent) {

@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Setter
 @Entity
 @Table(name = "participant")
-public class ParticipantModel{
+public class ParticipantModel extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

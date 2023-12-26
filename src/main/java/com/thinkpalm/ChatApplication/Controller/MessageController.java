@@ -38,9 +38,9 @@ public class MessageController {
         return new ResponseEntity<>(messageService.editMessage(editRequest),HttpStatus.OK);
     }
 
-    @PostMapping("/starOrUnstarMessage/{messageId}")
-    public ResponseEntity<String> starOrUnstarMessage(@PathVariable Integer messageId) {
-        return new ResponseEntity<>(messageService.starOrUnstarMessage(messageId),HttpStatus.OK);
+    @PostMapping("/starOrUnstarMessage")
+    public ResponseEntity<String> starOrUnstarMessage(@RequestBody Map<String,List<Integer>> starRequest) {
+        return new ResponseEntity<>(messageService.starOrUnstarMessage(starRequest.get("messageIds")),HttpStatus.OK);
     }
 
     @PostMapping("/deleteMessage")

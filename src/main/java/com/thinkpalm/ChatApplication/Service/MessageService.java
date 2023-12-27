@@ -247,10 +247,10 @@ public class MessageService {
                 starredMessageModel.setUser(currentUser);
                 starredMessageModel.setMessage(message);
                 starredMessageRepository.save(starredMessageModel);
-                return "starred";
+                response = response + "\n" + "message " + messageId + "starred";
             }else{
                 starredMessageRepository.deleteLiked(currentUser.getId(),messageId);
-                return "unstarred";
+                response = response + "\n" + "message " + messageId + "unstarred";
             }
         }
         return response;

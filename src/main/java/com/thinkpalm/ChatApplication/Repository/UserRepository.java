@@ -21,73 +21,67 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
     void updateUserBio(String username, String bio);
 
     @Query(value = "SELECT id, name, profile_pic, type, max(modified_at) as max_modified_at\n" +
-            "            FROM (\n" +
-            "                        SELECT u.id, u.name, u.profile_pic, 'user' as type, max(mr1.modified_at) as modified_at\n" +
-            "                        FROM chatdb.message_receiver as mr1\n" +
-            "                        INNER JOIN chatdb.message as m ON m.id = mr1.message_id\n" +
-            "                        INNER JOIN chatdb.user as u ON u.id = mr1.receiver_id\n" +
-            "                        WHERE m.sender_id = ?1\n" +
-            "                        GROUP BY u.id, u.name, u.profile_pic\n" +
-            "                        UNION\n" +
-            "                        SELECT u.id, u.name, u.profile_pic, 'user' as type, max(mr1.modified_at) as modified_at\n" +
-            "                        FROM chatdb.message_receiver as mr1\n" +
-            "                        INNER JOIN chatdb.message as m ON m.id = mr1.message_id\n" +
-            "                        INNER JOIN chatdb.user as u ON u.id = m.sender_id\n" +
-            "                        WHERE mr1.receiver_id = ?1\n" +
-            "                        GROUP BY u.id, u.name, u.profile_pic\n" +
-            "                        UNION\n" +
-            "                        SELECT r.id,r.name, r.room_pic, 'room' as type,CASE WHEN p.is_active IS false THEN p.left_at ELSE MAX(mr2.modified_at) END as timestamp\n" +
-            "                        FROM chatdb.message_room as mr2\n" +
-            "                        INNER JOIN chatdb.room as r ON r.id = mr2.room_id\n" +
-            "                        INNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
-            "                        WHERE p.user_id = ?1 or \n" +
-            "\t\t\t\t\t\t\t(p.is_active is false and mr2.modified_at < p.left_at)\n" +
-            "                        GROUP BY r.id, r.name, r.room_pic, p.left_at\n" +
-            "                        UNION\n" +
-            "                        SELECT r.id, r.name, r.room_pic, 'room' as type, r.created_at as modified_at\n" +
-            "                        FROM chatdb.room as r\n" +
-            "                        INNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
-            "                        WHERE p.user_id = ?1\n" +
-            "            ) AS combined_results\n" +
-            "                    GROUP BY id, name, profile_pic, type\n" +
-            "                    ORDER BY max_modified_at DESC;",nativeQuery = true)
+            "\tFROM (\n" +
+            "\t\tSELECT u.id, u.name, u.profile_pic, 'user' as type, mr1.modified_at\n" +
+            "\t\t\tFROM chatdb.message_receiver as mr1 \n" +
+            "\t\t\tINNER JOIN chatdb.message as m ON m.id = mr1.message_id \n" +
+            "\t\t\tINNER JOIN chatdb.user as u ON u.id = \n" +
+            "\t\t\t\tCASE\n" +
+            "\t\t\t\t\tWHEN m.sender_id = ?1 THEN mr1.receiver_id\n" +
+            "\t\t\t\t\tWHEN mr1.receiver_id = ?1 THEN m.sender_id\n" +
+            "\t\t\t\tEND\n" +
+            "\t\t\tWHERE\n" +
+            "\t\t\t\tm.sender_id = ?1 OR mr1.receiver_id = ?1\n" +
+            "\t\tUNION\n" +
+            "\t\tSELECT r.id,r.name, r.room_pic, 'room' as type,CASE WHEN p.left_at IS not null THEN p.left_at ELSE MAX(mr2.modified_at) END as timestamp\n" +
+            "\t\t\tFROM chatdb.message_room as mr2\n" +
+            "\t\t\tINNER JOIN chatdb.room as r ON r.id = mr2.room_id\n" +
+            "\t\t\tINNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
+            "\t\t\tWHERE p.user_id = ?1 or \n" +
+            "\t\t\t\t(p.is_active is false and mr2.modified_at < p.left_at)\n" +
+            "\t\t\tGROUP BY r.id, r.name, r.room_pic, p.left_at\n" +
+            "\t\tUNION\n" +
+            "\t\tSELECT r.id, r.name, r.room_pic, 'room' as type, r.created_at as modified_at\n" +
+            "\t\t\tFROM chatdb.room as r\n" +
+            "\t\t\tINNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
+            "\t\t\tWHERE p.user_id = ?1\n" +
+            "\t\t) AS combined_results\n" +
+            "\t\tGROUP BY id, name, profile_pic, type\n" +
+            "\t\tORDER BY max_modified_at DESC;",nativeQuery = true)
     List<Map<String,Object>> findAllChatsOfUser(Integer currentUserId);
 
     @Query(value = "select * from user where name = ?1 or phone_number = ?2",nativeQuery = true)
     List<UserModel> existByNameOrPhonenumber(String name, String phoneNumber);
 
     @Query(value = "SELECT id, name, profile_pic, type, max(modified_at) as max_modified_at\n" +
-            "            FROM (\n" +
-            "                        SELECT u.id, u.name, u.profile_pic, 'user' as type, max(mr1.modified_at) as modified_at\n" +
-            "                        FROM chatdb.message_receiver as mr1\n" +
-            "                        INNER JOIN chatdb.message as m ON m.id = mr1.message_id\n" +
-            "                        INNER JOIN chatdb.user as u ON u.id = mr1.receiver_id\n" +
-            "                        WHERE m.sender_id = ?1\n" +
-            "                        GROUP BY u.id, u.name, u.profile_pic\n" +
-            "                        UNION\n" +
-            "                        SELECT u.id, u.name, u.profile_pic, 'user' as type, max(mr1.modified_at) as modified_at\n" +
-            "                        FROM chatdb.message_receiver as mr1\n" +
-            "                        INNER JOIN chatdb.message as m ON m.id = mr1.message_id\n" +
-            "                        INNER JOIN chatdb.user as u ON u.id = m.sender_id\n" +
-            "                        WHERE mr1.receiver_id = ?1\n" +
-            "                        GROUP BY u.id, u.name, u.profile_pic\n" +
-            "                        UNION\n" +
-            "                        SELECT r.id,r.name, r.room_pic, 'room' as type,CASE WHEN p.is_active IS false THEN p.left_at ELSE MAX(mr2.modified_at) END as timestamp\n" +
-            "                        FROM chatdb.message_room as mr2\n" +
-            "                        INNER JOIN chatdb.room as r ON r.id = mr2.room_id\n" +
-            "                        INNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
-            "                        WHERE p.user_id = ?1 or \n" +
-            "\t\t\t\t\t\t\t(p.is_active is false and mr2.modified_at < p.left_at)\n" +
-            "                        GROUP BY r.id, r.name, r.room_pic, p.left_at\n" +
-            "                        UNION\n" +
-            "                        SELECT r.id, r.name, r.room_pic, 'room' as type, r.created_at as modified_at\n" +
-            "                        FROM chatdb.room as r\n" +
-            "                        INNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
-            "                        WHERE p.user_id = ?1\n" +
-            "            ) AS combined_results\n" +
-            "\t\t\t\t\twhere name LIKE CONCAT('%',?2,'%')\n" +
-            "                    GROUP BY id, name, profile_pic, type\n" +
-            "                    ORDER BY max_modified_at DESC;",nativeQuery = true)
+            "\tFROM (\n" +
+            "\t\tSELECT u.id, u.name, u.profile_pic, 'user' as type, mr1.modified_at\n" +
+            "\t\t\tFROM chatdb.message_receiver as mr1 \n" +
+            "\t\t\tINNER JOIN chatdb.message as m ON m.id = mr1.message_id \n" +
+            "\t\t\tINNER JOIN chatdb.user as u ON u.id = \n" +
+            "\t\t\t\tCASE\n" +
+            "\t\t\t\t\tWHEN m.sender_id = 2 THEN mr1.receiver_id\n" +
+            "\t\t\t\t\tWHEN mr1.receiver_id = 2 THEN m.sender_id\n" +
+            "\t\t\t\tEND\n" +
+            "\t\t\tWHERE\n" +
+            "\t\t\t\tm.sender_id = 2 OR mr1.receiver_id = 2\n" +
+            "\t\tUNION\n" +
+            "\t\tSELECT r.id,r.name, r.room_pic, 'room' as type,CASE WHEN p.left_at IS not null THEN p.left_at ELSE MAX(mr2.modified_at) END as timestamp\n" +
+            "\t\t\tFROM chatdb.message_room as mr2\n" +
+            "\t\t\tINNER JOIN chatdb.room as r ON r.id = mr2.room_id\n" +
+            "\t\t\tINNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
+            "\t\t\tWHERE p.user_id = 2 or \n" +
+            "\t\t\t\t(p.is_active is false and mr2.modified_at < p.left_at)\n" +
+            "\t\t\tGROUP BY r.id, r.name, r.room_pic, p.left_at\n" +
+            "\t\tUNION\n" +
+            "\t\tSELECT r.id, r.name, r.room_pic, 'room' as type, r.created_at as modified_at\n" +
+            "\t\t\tFROM chatdb.room as r\n" +
+            "\t\t\tINNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
+            "\t\t\tWHERE p.user_id = 2\n" +
+            "\t\t) AS combined_results\n" +
+            "\t\twhere name LIKE CONCAT('%',?2,'%')\n" +
+            "\t\tGROUP BY id, name, profile_pic, type\n" +
+            "\t\tORDER BY max_modified_at DESC;",nativeQuery = true)
     List<Map<String, Object>> searchChats(Integer currentUserId,String searchName);
 
     @Query(value = "SELECT r.*\n" +

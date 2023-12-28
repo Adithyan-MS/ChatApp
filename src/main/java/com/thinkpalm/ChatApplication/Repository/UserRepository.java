@@ -60,24 +60,24 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "\t\t\tINNER JOIN chatdb.message as m ON m.id = mr1.message_id \n" +
             "\t\t\tINNER JOIN chatdb.user as u ON u.id = \n" +
             "\t\t\t\tCASE\n" +
-            "\t\t\t\t\tWHEN m.sender_id = 2 THEN mr1.receiver_id\n" +
-            "\t\t\t\t\tWHEN mr1.receiver_id = 2 THEN m.sender_id\n" +
+            "\t\t\t\t\tWHEN m.sender_id = ?1 THEN mr1.receiver_id\n" +
+            "\t\t\t\t\tWHEN mr1.receiver_id = ?1 THEN m.sender_id\n" +
             "\t\t\t\tEND\n" +
             "\t\t\tWHERE\n" +
-            "\t\t\t\tm.sender_id = 2 OR mr1.receiver_id = 2\n" +
+            "\t\t\t\tm.sender_id = ?1 OR mr1.receiver_id = ?1\n" +
             "\t\tUNION\n" +
             "\t\tSELECT r.id,r.name, r.room_pic, 'room' as type,CASE WHEN p.left_at IS not null THEN p.left_at ELSE MAX(mr2.modified_at) END as timestamp\n" +
             "\t\t\tFROM chatdb.message_room as mr2\n" +
             "\t\t\tINNER JOIN chatdb.room as r ON r.id = mr2.room_id\n" +
             "\t\t\tINNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
-            "\t\t\tWHERE p.user_id = 2 or \n" +
+            "\t\t\tWHERE p.user_id = ?1 or \n" +
             "\t\t\t\t(p.is_active is false and mr2.modified_at < p.left_at)\n" +
             "\t\t\tGROUP BY r.id, r.name, r.room_pic, p.left_at\n" +
             "\t\tUNION\n" +
             "\t\tSELECT r.id, r.name, r.room_pic, 'room' as type, r.created_at as modified_at\n" +
             "\t\t\tFROM chatdb.room as r\n" +
             "\t\t\tINNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
-            "\t\t\tWHERE p.user_id = 2\n" +
+            "\t\t\tWHERE p.user_id = ?1\n" +
             "\t\t) AS combined_results\n" +
             "\t\twhere name LIKE CONCAT('%',?2,'%')\n" +
             "\t\tGROUP BY id, name, profile_pic, type\n" +

@@ -45,6 +45,7 @@ public class RoomService {
                 room.setName(createRoomRequest.getName());
                 room.setDescription(createRoomRequest.getDesc());
                 room.setRoom_pic(createRoomRequest.getPic());
+                room.setCreatedBy(currentUser);
                 roomRepository.save(room);
 
                 ParticipantModel participantModel = new ParticipantModel();

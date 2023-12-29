@@ -26,5 +26,8 @@ public class RoomModel extends Auditable{
     @Column
     private String room_pic;
 
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private UserModel createdBy;
 
 }

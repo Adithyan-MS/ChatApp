@@ -80,15 +80,15 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "        r.room_pic as profile_pic,\n" +
             "        'room' as type,\n" +
             "        m.content as latest_message,\n" +
-            "        m.sender_id as latest_message_sender_id,\n" +
+            "        u.id as latest_message_sender_id,\n" +
             "        u.name as latest_message_sender_name,\n" +
-            "        CASE WHEN p.left_at IS not null THEN p.left_at ELSE MAX(m.modified_at) END as max_modified_at,\n" +
+            "        CASE WHEN p.left_at IS not null THEN p.left_at WHEN m.sender_id is null THEN r.created_at ELSE MAX(m.modified_at) END as max_modified_at,\n" +
             "        ROW_NUMBER() OVER (PARTITION BY r.id ORDER BY mr2.modified_at DESC) as message_rank\n" +
             "    FROM\n" +
-            "        chatdb.message_room as mr2\n" +
-            "        INNER JOIN chatdb.room as r ON r.id = mr2.room_id\n" +
-            "        INNER JOIN chatdb.message as m ON m.id = mr2.message_id\n" +
-            "        INNER JOIN chatdb.user as u ON u.id = m.sender_id\n" +
+            "        chatdb.room as r\n" +
+            "        LEFT JOIN chatdb.message_room as mr2 ON r.id = mr2.room_id\n" +
+            "        LEFT JOIN chatdb.message as m ON m.id = mr2.message_id\n" +
+            "        LEFT JOIN chatdb.user as u ON u.id = CASE WHEN m.sender_id IS NOT NULL THEN m.sender_id ELSE r.created_by END\n" +
             "        INNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
             "        LEFT JOIN chatdb.deleted_message as dm2 ON dm2.message_id = m.id AND dm2.deleted_by = ?1\n" +
             "    WHERE\n" +
@@ -147,15 +147,15 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "        r.room_pic as profile_pic,\n" +
             "        'room' as type,\n" +
             "        m.content as latest_message,\n" +
-            "        m.sender_id as latest_message_sender_id,\n" +
+            "        u.id as latest_message_sender_id,\n" +
             "        u.name as latest_message_sender_name,\n" +
-            "        CASE WHEN p.left_at IS not null THEN p.left_at ELSE MAX(m.modified_at) END as max_modified_at,\n" +
+            "        CASE WHEN p.left_at IS not null THEN p.left_at WHEN m.sender_id is null THEN r.created_at ELSE MAX(m.modified_at) END as max_modified_at,\n" +
             "        ROW_NUMBER() OVER (PARTITION BY r.id ORDER BY mr2.modified_at DESC) as message_rank\n" +
             "    FROM\n" +
-            "        chatdb.message_room as mr2\n" +
-            "        INNER JOIN chatdb.room as r ON r.id = mr2.room_id\n" +
-            "        INNER JOIN chatdb.message as m ON m.id = mr2.message_id\n" +
-            "        INNER JOIN chatdb.user as u ON u.id = m.sender_id\n" +
+            "        chatdb.room as r\n" +
+            "        LEFT JOIN chatdb.message_room as mr2 ON r.id = mr2.room_id\n" +
+            "        LEFT JOIN chatdb.message as m ON m.id = mr2.message_id\n" +
+            "        LEFT JOIN chatdb.user as u ON u.id = CASE WHEN m.sender_id IS NOT NULL THEN m.sender_id ELSE r.created_by END\n" +
             "        INNER JOIN chatdb.participant as p ON p.room_id = r.id\n" +
             "        LEFT JOIN chatdb.deleted_message as dm2 ON dm2.message_id = m.id AND dm2.deleted_by = ?1\n" +
             "    WHERE\n" +

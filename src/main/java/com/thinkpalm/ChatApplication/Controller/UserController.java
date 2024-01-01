@@ -57,5 +57,13 @@ public class UserController {
     public ResponseEntity<List<Map<String, Object>>> getCommonRooms(@PathVariable String otherUserName){
         return new ResponseEntity<>(userService.getCommonRooms(otherUserName),HttpStatus.OK);
     }
+    @GetMapping("/starredMessages")
+    public ResponseEntity<List<Map<String, Object>>> getStarredMessages(){
+        return new ResponseEntity<>(userService.getStarredMessages(),HttpStatus.OK);
+    }
+    @GetMapping("/starredMessages/search")
+    public ResponseEntity<List<Map<String, Object>>> searchStarredMessageChats(@RequestParam("name") String searchName){
+        return new ResponseEntity<>(userService.searchStarredMessageChats(searchName),HttpStatus.OK);
+    }
 
 }

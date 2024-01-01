@@ -92,4 +92,22 @@ public class UserService {
     }
 
 
+    public List<Map<String, Object>> getStarredMessages() {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        if (currentUser!=null){
+            return userRepository.findAllStarredMessages(currentUser.getId());
+        }else {
+            throw new UserNotFoundException("User Not Found!");
+        }
+    }
+
+    public List<Map<String, Object>> searchStarredMessageChats(String searchName) {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        if (currentUser!=null){
+            List<Map<String, Object>> result  =  userRepository.searchStarredMessageChats(currentUser.getId(), searchName);
+            return result;
+        }else{
+            throw new UserNotFoundException("User Not Found!");
+        }
+    }
 }

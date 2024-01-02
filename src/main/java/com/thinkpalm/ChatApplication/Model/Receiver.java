@@ -8,5 +8,4 @@ import lombok.Setter;
 public class Receiver {
     private ReceiverType type;
     private Integer id;
-
 }

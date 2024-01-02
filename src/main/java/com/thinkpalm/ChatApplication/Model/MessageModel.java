@@ -2,6 +2,7 @@ package com.thinkpalm.ChatApplication.Model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
@@ -21,6 +22,10 @@ public class MessageModel extends Auditable{
     @Column
     @NonNull
     private String content;
+
+    @Column
+    @NotNull
+    private MessageType type;
 
     @NonNull
     @ManyToOne(cascade = CascadeType.PERSIST)

@@ -8,6 +8,7 @@ import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -265,5 +266,9 @@ public class MessageService {
         }else {
             throw  new InvalidDataException("No search content");
         }
+    }
+
+    public String sendFile(MultipartFile[] files,MessageSendRequest msg) {
+        return "jj";
     }
 }

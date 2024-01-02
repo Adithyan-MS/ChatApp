@@ -77,7 +77,6 @@ public class ImageService {
                 if(room!=null){
                     try(OutputStream outputStream = new FileOutputStream(String.valueOf(filePath))){
                         outputStream.write(multipartFile.getBytes());
-
                         room.setRoom_pic(fileName);
                         roomRepository.save(room);
                     } catch (FileNotFoundException e) {

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,10 @@ public class MessageController {
     @PostMapping("/sendMessage")
     public ResponseEntity<String> sendMessage(@RequestBody MessageSendRequest msg) throws IllegalAccessException {
         return new ResponseEntity<>(messageService.sendMessage(msg),HttpStatus.OK);
+    }
+    @PostMapping("/sendFile")
+    public ResponseEntity<String> sendFile(@RequestParam("files") MultipartFile[] files, @RequestPart MessageSendRequest msg) {
+        return new ResponseEntity<>(messageService.sendFile(files,msg),HttpStatus.OK);
     }
 
     @PostMapping("/forwardMessage")

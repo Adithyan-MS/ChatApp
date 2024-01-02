@@ -82,6 +82,7 @@ public class MessageService {
     public MessageModel saveMessage(Message message,UserModel sender){
         MessageModel messageModel = new MessageModel();
         messageModel.setContent(message.getContent());
+        messageModel.setType(message.getType());
         messageModel.setSender(sender);
         if(message.getParentMessage() != null){
             MessageModel parentMessage = messageRepository.findById(message.getParentMessage()).orElse(null);
@@ -100,6 +101,7 @@ public class MessageService {
             if(originalMessage != null){
                 MessageModel newMessage = new MessageModel();
                 newMessage.setContent(originalMessage.getContent());
+                newMessage.setType(originalMessage.getType());
                 newMessage.setSender(currentUser);
                 messageRepository.save(newMessage);
                 for(Receiver receiver : messageForwardRequest.getReceivers()){

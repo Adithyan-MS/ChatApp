@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class Message {
     private String content;
+    private MessageType type;
     private Integer parentMessage;
 
 }

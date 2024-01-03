@@ -27,13 +27,13 @@ public class ImageController {
         return new ResponseEntity<>(imageService.uploadPicture(multipartFile), HttpStatus.OK);
     }
     @PostMapping("/upload/{roomId}")
-    public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile) throws IllegalAccessException {
+    public ResponseEntity<String> uploadProfilePic(@PathVariable Integer roomId,@RequestParam("file") MultipartFile multipartFile) throws IllegalAccessException, IOException {
         return new ResponseEntity<>(imageService.uploadPicture(roomId,multipartFile), HttpStatus.OK);
     }
-    @GetMapping("/view/{filename}")
-    public ResponseEntity<byte[]> viewImage(@PathVariable String filename) throws IOException {
+    @GetMapping("/view/{name}/{filename}")
+    public ResponseEntity<byte[]> viewImage(@PathVariable String filename,@PathVariable String name) throws IOException {
         String contentType = determineContentType(filename);
-        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(imageService.viewImage(filename));
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(imageService.viewImage(filename,name));
     }
 
     private String determineContentType(String filename) {

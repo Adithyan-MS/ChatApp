@@ -1,6 +1,7 @@
 package com.thinkpalm.ChatApplication.Service;
 
 import com.thinkpalm.ChatApplication.Exception.InvalidDataException;
+import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Repository.ParticipantModelRepository;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Model.RoomModel;
@@ -11,10 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,59 +40,75 @@ public class ImageService {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String formattedDateTime = dateFormat.format(new Date());
 
-            String fileName = formattedDateTime+"_"+multipartFile.getOriginalFilename();
-            Path filePath = Paths.get(uploadDirectory, fileName);
-
             UserModel user = userRepository.findByName(AppContext.getUserName()).orElse(null);
-            if(user!=null){
-                try(OutputStream outputStream = new FileOutputStream(String.valueOf(filePath))){
-                    outputStream.write(multipartFile.getBytes());
+            if (user != null) {
+                String filePath = uploadDirectory + "/" + user.getName() + "/";
+                try {
+                    File directory = new File(filePath);
+                    if (!directory.exists()) {
+                        directory.mkdirs();
+                    }
+                    String fileName = formattedDateTime+"_"+multipartFile.getOriginalFilename();
+                    Path path = Paths.get(filePath, fileName);
+                    byte[] bytes = multipartFile.getBytes();
+                    Files.write(path, bytes);
+
                     user.setProfilePic(fileName);
                     userRepository.save(user);
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            return fileName;
-        }else{
-            return "file not found!";
-        }
+                    String relativePath = user.getName() + "/" + fileName;
 
+                    return fileName;
+                } catch (IOException e) {
+                    throw new IOException();
+                }
+            }else{
+                throw new UserNotFoundException("User Not Found!");
+            }
+        }else{
+            throw new FileNotFoundException();
+        }
     }
 
-    public String uploadPicture(Integer roomId,MultipartFile multipartFile) throws IllegalAccessException {
+    public String uploadPicture(Integer roomId,MultipartFile multipartFile) throws IllegalAccessException, IOException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
             if(!multipartFile.isEmpty()){
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
                 String formattedDateTime = dateFormat.format(new Date());
-
-                String fileName = formattedDateTime+"_"+multipartFile.getOriginalFilename();
-                Path filePath = Paths.get(uploadDirectory, fileName);
                 RoomModel room = roomRepository.findById(roomId).orElse(null);
-                if(room!=null){
-                    try(OutputStream outputStream = new FileOutputStream(String.valueOf(filePath))){
-                        outputStream.write(multipartFile.getBytes());
+                if (room != null) {
+                    String filePath = uploadDirectory + "/" + room.getName() + "/";
+                    try {
+                        File directory = new File(filePath);
+                        if (!directory.exists()) {
+                            directory.mkdirs();
+                        }
+                        String fileName = formattedDateTime+"_"+multipartFile.getOriginalFilename();
+                        Path path = Paths.get(filePath, fileName);
+                        byte[] bytes = multipartFile.getBytes();
+                        Files.write(path, bytes);
+
                         room.setRoom_pic(fileName);
                         roomRepository.save(room);
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                        String relativePath = room.getName() + "/" + fileName;
+
+                        return fileName;
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new IOException();
                     }
+                }else{
+                    throw new UserNotFoundException("User Not Found!");
                 }
-                return fileName;
             }else{
-                throw new InvalidDataException("File not found!");
+                throw new FileNotFoundException();
             }
         }else{
-            throw new IllegalAccessException("You are not an Admin!");
+            throw new IllegalAccessException("User is not an Admin!");
         }
     }
-    public byte[] viewImage(String filename) throws IOException {
-        String filePath = uploadDirectory +"/"+ filename;
+    public byte[] viewImage(String filename,String name) throws IOException {
+        String filePath = uploadDirectory +"/" + name + "/"+ filename;
+        System.out.println(filePath);
         Path path = Paths.get(filePath);
         byte[] imageBytes = Files.readAllBytes(path);
         return imageBytes;

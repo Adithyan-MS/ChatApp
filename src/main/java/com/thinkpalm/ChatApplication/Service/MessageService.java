@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Exception.InvalidDataException;
 import com.thinkpalm.ChatApplication.Exception.RoomNotFoundException;
@@ -7,9 +8,17 @@ import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -26,6 +35,9 @@ public class MessageService {
     private final MessageHistoryRepository messageHistoryRepository;
     private final DeletedMessageRepository deletedMessageRepository;
     private final StarredMessageRepository starredMessageRepository;
+
+    @Value("${spring.servlet.multipart.location}")
+    private String uploadDirectory;
 
     @Autowired
     public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageReceiverRepository messageReceiverRepository, RoomRepository roomRepository, MessageRoomRepository messageRoomRepository, ParticipantModelRepository participantModelRepository, LikeRepository likeRepository, MessageHistoryRepository messageHistoryRepository, DeletedMessageRepository deletedMessageRepository, StarredMessageRepository starredMessageRepository){
@@ -80,6 +92,39 @@ public class MessageService {
             throw new UserNotFoundException("User not found!");
         }
     }
+
+    public String sendFile(MultipartFile[] files,String messageSendRequestText) {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        if(currentUser!=null){
+            MessageSendRequest messageSendRequest = getMessageSendRequestJSON(messageSendRequestText);
+            Arrays.asList(files).stream().forEach(file -> {
+                try {
+                    String fileName = uploadFile(file, currentUser.getName(),messageSendRequest.getMessage().getType());
+                    messageSendRequest.getMessage().setContent(fileName);
+                    sendMessage(messageSendRequest);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            return null;
+        }else {
+            throw new UserNotFoundException("User not found!");
+        }
+    }
+
+    public MessageSendRequest getMessageSendRequestJSON(String MessageSendRequestText){
+        MessageSendRequest messageSendRequest = new MessageSendRequest();
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            messageSendRequest = objectMapper.readValue(MessageSendRequestText,MessageSendRequest.class);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return messageSendRequest;
+    }
+
     public MessageModel saveMessage(Message message,UserModel sender){
         MessageModel messageModel = new MessageModel();
         messageModel.setContent(message.getContent());
@@ -94,6 +139,33 @@ public class MessageService {
         messageRepository.save(messageModel);
         return messageModel;
     }
+
+    public String uploadFile(MultipartFile multipartFile,String name,MessageType messageType) throws IOException {
+        if(!multipartFile.isEmpty()){
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            String formattedDateTime = dateFormat.format(new Date());
+            String filePath = uploadDirectory + "/" + name + "/" + messageType;
+            try {
+                File directory = new File(filePath);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+                String fileName = formattedDateTime+"_"+multipartFile.getOriginalFilename();
+                Path path = Paths.get(filePath, fileName);
+                byte[] bytes = multipartFile.getBytes();
+                Files.write(path, bytes);
+
+                String relativePath = name + "/" + messageType + "/" + fileName;
+
+                return fileName;
+            } catch (IOException e) {
+                throw new IOException();
+            }
+        }else{
+            throw new UserNotFoundException("User Not Found!");
+        }
+    }
+
 
     public String forwardMessage(MessageForwardRequest messageForwardRequest){
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
@@ -268,7 +340,11 @@ public class MessageService {
         }
     }
 
-    public String sendFile(MultipartFile[] files,MessageSendRequest msg) {
-        return "jj";
+    public byte[] viewImage(String filename,String name,String messageType) throws IOException {
+        String filePath = uploadDirectory +"/" + name + "/" + messageType + "/" + filename;
+        Path path = Paths.get(filePath);
+        byte[] imageBytes = Files.readAllBytes(path);
+        return imageBytes;
     }
+
 }

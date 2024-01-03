@@ -7,5 +7,6 @@ import lombok.Setter;
 
 public enum MessageType {
     text,
-    image
+    image,
+    document
 }

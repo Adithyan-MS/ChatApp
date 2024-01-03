@@ -1,16 +1,15 @@
 package com.thinkpalm.ChatApplication.Controller;
 
-import com.thinkpalm.ChatApplication.Model.EditRequest;
-import com.thinkpalm.ChatApplication.Model.MessageForwardRequest;
-import com.thinkpalm.ChatApplication.Model.MessageModel;
-import com.thinkpalm.ChatApplication.Model.MessageSendRequest;
+import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +29,8 @@ public class MessageController {
         return new ResponseEntity<>(messageService.sendMessage(msg),HttpStatus.OK);
     }
     @PostMapping("/sendFile")
-    public ResponseEntity<String> sendFile(@RequestParam("files") MultipartFile[] files, @RequestPart MessageSendRequest msg) {
-        return new ResponseEntity<>(messageService.sendFile(files,msg),HttpStatus.OK);
+    public ResponseEntity<String> sendFile(@RequestPart("files") MultipartFile[] files, @RequestPart("messageData") String messageSendRequestText) {
+        return new ResponseEntity<>(messageService.sendFile(files,messageSendRequestText),HttpStatus.OK);
     }
 
     @PostMapping("/forwardMessage")
@@ -86,6 +85,24 @@ public class MessageController {
     @GetMapping("/likes/{messageId}")
     public ResponseEntity<List<Map<String,Object>>> getMessageLikedUsers(@PathVariable Integer messageId){
         return new ResponseEntity<>(messageService.getMessageLikedUsers(messageId),HttpStatus.OK);
+    }
+
+    @GetMapping("/view/{name}/{fileType}/{filename}")
+    public ResponseEntity<byte[]> viewImage(@PathVariable String filename, @PathVariable String fileType, @PathVariable String name) throws IOException {
+        String contentType = determineContentType(filename);
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(messageService.viewImage(filename,name,fileType));
+    }
+
+    private String determineContentType(String filename) {
+        if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
+            return "image/jpeg";
+        } else if (filename.endsWith(".png")) {
+            return "image/png";
+        } else if (filename.endsWith(".gif")) {
+            return "image/gif";
+        } else {
+            return "application/octet-stream";
+        }
     }
 
 }

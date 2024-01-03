@@ -11,7 +11,7 @@ import java.util.Map;
 public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,Integer> {
     @Query(value = "SELECT\n" +
             "\tm.id, \n" +
-            "\tm.content,\n" +
+            "\tm.content,m.type\n" +
             "\tp.is_active,\n" +
             "\tm.sender_id,\n" +
             "    u.name as sender_name,\n" +
@@ -52,7 +52,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,In
 
     @Query(value = "SELECT\n" +
             "\tm.id, \n" +
-            "\tm.content,\n" +
+            "\tm.content,m.type\n" +
             "\tp.is_active,\n" +
             "\tm.sender_id,\n" +
             "    u.name as sender_name,\n" +

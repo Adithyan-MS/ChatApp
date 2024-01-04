@@ -100,6 +100,14 @@ public class MessageController {
             return "image/png";
         } else if (filename.endsWith(".gif")) {
             return "image/gif";
+        } else if (filename.endsWith(".doc")) {
+            return "application/msword";
+        } else if (filename.endsWith(".docx")) {
+            return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        } else if (filename.endsWith(".pdf")) {
+            return "application/pdf";
+        } else if (filename.endsWith(".txt")) {
+            return "text/plain";
         } else {
             return "application/octet-stream";
         }

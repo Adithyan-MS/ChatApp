@@ -22,7 +22,7 @@ public interface MessageReceiverRepository extends JpaRepository<MessageReceiver
 
 
     //new
-    @Query(value = "SELECT m.id, m.content, m.type, m.sender_id, u.name as sender_name,case when sm.id is null then 0 else 1 end as is_starred, m.parent_message_id,u1.name as parent_message_sender ,m1.content as parent_message_content, m.like_count, m.created_at, m.modified_at\n" +
+    @Query(value = "SELECT m.id, m.content, m.type, m.sender_id, u.name as sender_name,case when sm.id is null then 0 else 1 end as is_starred, m.parent_message_id,u1.name as parent_message_sender ,m1.content as parent_message_content,m1.type as parent_message_type, m.like_count, m.created_at, m.modified_at\n" +
             "            FROM chatdb.message AS m\n" +
             "\t\t\tJOIN chatdb.message_receiver AS mr ON m.id = mr.message_id\n" +
             "            JOIN chatdb.user AS u ON m.sender_id = u.id\n" +
@@ -36,7 +36,7 @@ public interface MessageReceiverRepository extends JpaRepository<MessageReceiver
             "            ORDER BY m.created_at",nativeQuery = true)
     List<Map<String, Object>> getAllUserChatMessages(Integer currentUserId,Integer otherUserId);
 
-    @Query(value = "SELECT m.id, m.content, m.type, m.sender_id, u.name as sender_name,case when sm.id is null then 0 else 1 end as is_starred, m.parent_message_id,u1.name as parent_message_sender ,m1.content as parent_message_content, m.like_count, m.created_at, m.modified_at\n" +
+    @Query(value = "SELECT m.id, m.content, m.type, m.sender_id, u.name as sender_name,case when sm.id is null then 0 else 1 end as is_starred, m.parent_message_id,u1.name as parent_message_sender ,m1.content as parent_message_content,m1.type as parent_message_type, m.like_count, m.created_at, m.modified_at\n" +
             "FROM chatdb.message AS m\n" +
             "JOIN chatdb.message_receiver AS mr ON m.id = mr.message_id\n" +
             "JOIN chatdb.user AS u ON m.sender_id = u.id\n" +

@@ -108,7 +108,7 @@ public class MessageService {
                     throw new RuntimeException(e);
                 }
             });
-            return null;
+            return "file send Successfully";
         }else {
             throw new UserNotFoundException("User not found!");
         }

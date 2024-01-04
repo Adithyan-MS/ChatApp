@@ -24,7 +24,7 @@ public class MessageModel extends Auditable{
     private String content;
 
     @Column
-    @NotNull
+    @Enumerated(EnumType.STRING)
     private MessageType type;
 
     @NonNull

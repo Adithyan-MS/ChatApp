@@ -18,6 +18,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,In
             "    CASE WHEN sm.id IS NULL THEN 0 ELSE 1 END as is_starred,\n" +
             "\tm.parent_message_id, \n" +
             "\tm1.content as parent_message_content,\n" +
+            "\tm1.type as parent_message_type,\n" +
             "\tu1.name as parent_message_sender,\n" +
             "\tm.like_count, \n" +
             "\tm.created_at,\n" +
@@ -59,6 +60,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,In
             "    CASE WHEN sm.id IS NULL THEN 0 ELSE 1 END as is_starred,\n" +
             "\tm.parent_message_id, \n" +
             "\tm1.content as parent_message_content,\n" +
+            "\tm1.type as parent_message_type,\n" +
             "\tu1.name as parent_message_sender,\n" +
             "\tm.like_count, \n" +
             "\tm.created_at,\n" +

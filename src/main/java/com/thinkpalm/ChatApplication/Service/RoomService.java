@@ -91,6 +91,7 @@ public class RoomService {
                                 }else{
                                     participant.setIs_active(true);
                                     participant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
+                                    participant.setLeft_at(null);
                                     participantModelRepository.save(participant);
                                     return "user joined.";
                                 }
@@ -154,6 +155,7 @@ public class RoomService {
                 }else{
                     participant.setIs_active(true);
                     participant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
+                    participant.setLeft_at(null);
                     participantModelRepository.save(participant);
                     return "user joined.";
                 }

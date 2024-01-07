@@ -108,7 +108,6 @@ public class ImageService {
     }
     public byte[] viewImage(String filename,String name) throws IOException {
         String filePath = uploadDirectory +"/" + name + "/"+ filename;
-        System.out.println(filePath);
         Path path = Paths.get(filePath);
         byte[] imageBytes = Files.readAllBytes(path);
         return imageBytes;

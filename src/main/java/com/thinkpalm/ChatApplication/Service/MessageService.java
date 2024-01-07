@@ -20,6 +20,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -172,6 +174,17 @@ public class MessageService {
         for(Integer messageId : messageForwardRequest.getMessageIds()){
             MessageModel originalMessage = messageRepository.findById(messageId).orElse(null);
             if(originalMessage != null){
+                if (originalMessage.getType()!=MessageType.text){
+                    try{
+                        byte[] fileBytes = viewFile(originalMessage.getContent(),originalMessage.getSender().getName(),originalMessage.getType().toString());
+                        originalMessage.setContent(extractFileName(originalMessage.getContent()));
+                        MultipartFile multipartFile = new BASE64DecodedMultipartFile(fileBytes,originalMessage.getContent());
+                        String newContent = uploadFile(multipartFile,currentUser.getName(),originalMessage.getType());
+                        originalMessage.setContent(newContent);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 MessageModel newMessage = new MessageModel();
                 newMessage.setContent(originalMessage.getContent());
                 newMessage.setType(originalMessage.getType());
@@ -340,11 +353,21 @@ public class MessageService {
         }
     }
 
-    public byte[] viewImage(String filename,String name,String messageType) throws IOException {
+    public byte[] viewFile(String filename,String name,String messageType) throws IOException {
         String filePath = uploadDirectory +"/" + name + "/" + messageType + "/" + filename;
         Path path = Paths.get(filePath);
         byte[] imageBytes = Files.readAllBytes(path);
         return imageBytes;
+    }
+
+    private static String extractFileName(String originalFileName) {
+        Pattern pattern = Pattern.compile("\\d{8}_\\d{6}_(.*)");
+        Matcher matcher = pattern.matcher(originalFileName);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        } else {
+            return originalFileName;
+        }
     }
 
 }

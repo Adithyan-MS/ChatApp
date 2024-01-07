@@ -44,9 +44,9 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,In
             "\t\tmr.room_id = ?1\n" +
             "\t\tAND dm.message_id IS NULL\n" +
             "\t\tAND (\n" +
-            "\t\t\t\t(p.is_active = false and m.created_at >= p.joined_at AND (p.left_at IS NULL OR m.created_at <= p.left_at))\n" +
+            "\t\t\t\t(p.is_active = false AND (m.created_at >= p.joined_at AND m.created_at <= p.left_at))\n" +
             "\t\t\tor\n" +
-            "\t\t\t\t(p.is_active = true AND (p.left_at is null and m.created_at >= p.joined_at))\n" +
+            "\t\t\t\t(p.is_active = true AND m.created_at >= p.joined_at)\n" +
             "\t\t\t)\n" +
             "\tORDER BY\n" +
             "\tm.created_at",nativeQuery = true)

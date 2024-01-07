@@ -3,6 +3,8 @@ package com.thinkpalm.ChatApplication.Controller;
 import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -87,29 +89,44 @@ public class MessageController {
         return new ResponseEntity<>(messageService.getMessageLikedUsers(messageId),HttpStatus.OK);
     }
 
-    @GetMapping("/view/{name}/{fileType}/{filename}")
-    public ResponseEntity<byte[]> viewImage(@PathVariable String filename, @PathVariable String fileType, @PathVariable String name) throws IOException {
-        String contentType = determineContentType(filename);
-        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(messageService.viewImage(filename,name,fileType));
+    @GetMapping("/view/{name}/image/{filename}")
+    public ResponseEntity<byte[]> viewImage(@PathVariable String filename, @PathVariable String name) throws IOException {
+        MediaType mediaType = determineContentType(filename);
+        return ResponseEntity.ok().contentType(mediaType).body(messageService.viewFile(filename,name,"image"));
     }
 
-    private String determineContentType(String filename) {
+    @GetMapping("/view/{name}/document/{filename}")
+    public ResponseEntity<ByteArrayResource> viewDocument(@PathVariable String filename, @PathVariable String name) {
+        try {
+            byte[] documentBytes = messageService.viewFile(filename,name,"document");
+            MediaType mediaType = determineContentType(filename);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            ByteArrayResource resource = new ByteArrayResource(documentBytes);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(mediaType)
+                    .body(resource);
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    private MediaType determineContentType(String filename) {
         if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
-            return "image/jpeg";
+            return MediaType.IMAGE_JPEG;
         } else if (filename.endsWith(".png")) {
-            return "image/png";
+            return MediaType.IMAGE_PNG;
         } else if (filename.endsWith(".gif")) {
-            return "image/gif";
-        } else if (filename.endsWith(".doc")) {
-            return "application/msword";
-        } else if (filename.endsWith(".docx")) {
-            return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        } else if (filename.endsWith(".pdf")) {
-            return "application/pdf";
+            return MediaType.IMAGE_GIF;
         } else if (filename.endsWith(".txt")) {
-            return "text/plain";
+            return MediaType.TEXT_PLAIN;
+        } else if (filename.endsWith(".doc") || filename.endsWith(".docx")) {
+            return MediaType.APPLICATION_PDF;
+        } else if (filename.endsWith(".pdf")) {
+            return MediaType.APPLICATION_PDF;
         } else {
-            return "application/octet-stream";
+            return MediaType.APPLICATION_OCTET_STREAM;
         }
     }
 

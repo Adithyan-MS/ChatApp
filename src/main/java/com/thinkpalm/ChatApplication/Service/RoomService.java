@@ -4,20 +4,20 @@ import com.thinkpalm.ChatApplication.Exception.DuplicateEntryException;
 import com.thinkpalm.ChatApplication.Exception.InvalidDataException;
 import com.thinkpalm.ChatApplication.Exception.RoomNotFoundException;
 import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
+import com.thinkpalm.ChatApplication.Repository.RoomLogRepository;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.ParticipantModelRepository;
 import com.thinkpalm.ChatApplication.Repository.RoomRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class RoomService {
@@ -26,13 +26,15 @@ public class RoomService {
     private final UserRepository userRepository;
     private final ParticipantModelRepository participantModelRepository;
     private final ImageService imageService;
+    private final RoomLogRepository roomLogRepository;
 
     @Autowired
-    public RoomService(RoomRepository roomRepository, UserRepository userRepository, ParticipantModelRepository participantModelRepository, ImageService imageService){
+    public RoomService(RoomRepository roomRepository, UserRepository userRepository, ParticipantModelRepository participantModelRepository, ImageService imageService, RoomLogRepository roomLogRepository){
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
         this.participantModelRepository = participantModelRepository;
         this.imageService = imageService;
+        this.roomLogRepository = roomLogRepository;
     }
 
     public RoomModel createRoom(CreateRoomRequest createRoomRequest) {
@@ -56,6 +58,9 @@ public class RoomService {
                 participantModel.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
                 participantModelRepository.save(participantModel);
 
+                setRoomLog(room,currentUser,RoomAction.join);
+                setRoomLog(room,currentUser,RoomAction.madeAdmin);
+
                 for (Integer participant : createRoomRequest.getParticipants()) {
                     UserModel user = userRepository.findById(participant).orElse(null);
                     if (user != null) {
@@ -66,6 +71,8 @@ public class RoomService {
                         participantModel1.setIs_active(true);
                         participantModel1.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
                         participantModelRepository.save(participantModel1);
+
+                        setRoomLog(room,user,RoomAction.join);
                     }
                 }
                 return room;
@@ -93,6 +100,8 @@ public class RoomService {
                                     participant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
                                     participant.setLeft_at(null);
                                     participantModelRepository.save(participant);
+
+                                    setRoomLog(room,user,RoomAction.join);
                                     return "user joined.";
                                 }
                             }else{
@@ -103,6 +112,8 @@ public class RoomService {
                                 newParticipant.setIs_active(true);
                                 newParticipant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
                                 participantModelRepository.save(newParticipant);
+
+                                setRoomLog(room,user,RoomAction.join);
                                 response = response + "\n" + "User "+memberId+" successfully added.";
                             }
                         }else{
@@ -129,6 +140,8 @@ public class RoomService {
                 for (Integer memberId : memberIds){
                     if(participantModelRepository.existsRoomParticipant(roomId,memberId)!=0){
                         participantModelRepository.deactivateParticipant(roomId,memberId, Timestamp.valueOf(LocalDateTime.now()));
+                        Optional<UserModel> user = userRepository.findById(memberId);
+                        setRoomLog(room,user.get(),RoomAction.leave);
                         response = response+"\n"+memberId+" removed";
                     }else{
                         response = response+"\n"+memberId+" is not a participant";
@@ -157,6 +170,8 @@ public class RoomService {
                     participant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
                     participant.setLeft_at(null);
                     participantModelRepository.save(participant);
+
+                    setRoomLog(room,currentUser,RoomAction.join);
                     return "user joined.";
                 }
             }else{
@@ -167,6 +182,8 @@ public class RoomService {
                 newParticipant.setIs_active(true);
                 newParticipant.setJoined_at(Timestamp.valueOf(LocalDateTime.now()));
                 participantModelRepository.save(newParticipant);
+
+                setRoomLog(room,currentUser,RoomAction.join);
                 return "user joined.";
             }
         }
@@ -182,12 +199,16 @@ public class RoomService {
             if(participantModelRepository.isUserAdmin(roomId, currentUser.getId()).orElse(false)){
                 if(participantModelRepository.getRoomAdminCount(roomId)>1){
                     participantModelRepository.deactivateParticipant(roomId, currentUser.getId(),Timestamp.valueOf(LocalDateTime.now()));
+
+                    setRoomLog(room,currentUser,RoomAction.leave);
                     return "user exited from room.";
                 }else{
                     throw new IllegalAccessException("Can't exit, you are the only admin!");
                 }
             }else{
                 participantModelRepository.deactivateParticipant(roomId, currentUser.getId(), Timestamp.valueOf(LocalDateTime.now()));
+
+                setRoomLog(room,currentUser,RoomAction.leave);
                 return "user exited from room.";
             }
         }
@@ -203,6 +224,8 @@ public class RoomService {
             if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
                 if(!participantModelRepository.isUserAdmin(roomId,otherUserId).orElse(false)){
                     if(participantModelRepository.makeRoomAdmin(roomId,otherUserId)>0){
+                        UserModel user = userRepository.findById(otherUserId).orElse(null);
+                        setRoomLog(room,user,RoomAction.madeAdmin);
                         return "User " + otherUserId + " is now an Admin";
                     }else{
                         throw new InvalidDataException("User " + otherUserId + " can't be an Admin");
@@ -227,6 +250,8 @@ public class RoomService {
             if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
                 if(participantModelRepository.isUserAdmin(roomId,otherUserId).orElse(false)){
                     if(participantModelRepository.dismissRoomAdmin(roomId,otherUserId)>0){
+                        UserModel user = userRepository.findById(otherUserId).orElse(null);
+                        setRoomLog(room,user,RoomAction.dismissAdmin);
                         return "User " + otherUserId + " is successfully dismissed as Admin";
                     }else{
                         throw new InvalidDataException("User " + otherUserId + " can't be dismissed as Admin!");
@@ -277,5 +302,14 @@ public class RoomService {
         }else{
             throw new RoomNotFoundException("Room not found!");
         }
+    }
+
+    public void setRoomLog(RoomModel room,UserModel user, RoomAction action){
+        RoomLogModel roomLog = new RoomLogModel();
+        roomLog.setRoom(room);
+        roomLog.setUser(user);
+        roomLog.setAction(action);
+        roomLog.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+        roomLogRepository.save(roomLog);
     }
 }

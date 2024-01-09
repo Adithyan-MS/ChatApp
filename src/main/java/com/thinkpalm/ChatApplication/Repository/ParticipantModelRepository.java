@@ -61,6 +61,11 @@ public interface ParticipantModelRepository extends JpaRepository<ParticipantMod
 
     @Query(value = "select * from participant where room_id = ?1 and user_id = ?2",nativeQuery = true)
     Optional<ParticipantModel> findByRoomAndUser(Integer roomId, Integer id);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update participant set is_deleted = true where room_id = ?1 and user_id = ?2",nativeQuery = true)
+    void deleteRoomForUser(Integer roomId, Integer id);
 }
 
 

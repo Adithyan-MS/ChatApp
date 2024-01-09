@@ -10,6 +10,8 @@ import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.ParticipantModelRepository;
 import com.thinkpalm.ChatApplication.Repository.RoomRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
+import org.apache.catalina.User;
+import org.overviewproject.mime_types.App;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -324,6 +326,21 @@ public class RoomService {
                 throw new UserNotFoundException("User not found!");
             }
         }else{
+            throw new RoomNotFoundException("Room not found!");
+        }
+    }
+
+    public String deleteRoomforUser(Integer roomId) {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if (room!=null){
+            if (!IsUserPartcicpant(roomId, currentUser.getId())){
+                participantModelRepository.deleteRoomForUser(roomId,currentUser.getId());
+                return "Room '"+room.getName()+"' deleted.";
+            }else{
+                throw new InvalidDataException("Can't delete, you are still a participant in this room");
+            }
+        }else {
             throw new RoomNotFoundException("Room not found!");
         }
     }

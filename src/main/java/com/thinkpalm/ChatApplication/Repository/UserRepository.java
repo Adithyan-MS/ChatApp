@@ -68,6 +68,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "\t\t((p.user_id = ?1 and (p.is_active is false and mr2.modified_at < p.left_at))\n" +
             "\t\tor\n" +
             "\t\t(p.user_id = ?1 and (p.is_active is true)))\n" +
+            "\t\tAND p.is_deleted = false\n" +
             "\t\tAND dm2.message_id IS NULL\n" +
             "\tGROUP BY r.id, r.name, r.room_pic, m.id\n" +
             ")\n" +
@@ -141,6 +142,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "       ((p.user_id = ?1 and (p.is_active is false and mr2.modified_at < p.left_at))\n" +
             "       or\n" +
             "       (p.user_id = ?1 and (p.is_active is true)))\n" +
+            "       AND p.is_deleted = false\n" +
             "       AND dm2.message_id IS NULL\n" +
             "    GROUP BY r.id, r.name, r.room_pic, m.id\n" +
             ")\n" +

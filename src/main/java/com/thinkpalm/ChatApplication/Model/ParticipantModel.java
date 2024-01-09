@@ -30,6 +30,9 @@ public class ParticipantModel extends Auditable{
     @Column
     private Boolean is_active;
 
+    @Column(columnDefinition = "boolean default false")
+    private Boolean is_deleted;
+
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp joined_at;

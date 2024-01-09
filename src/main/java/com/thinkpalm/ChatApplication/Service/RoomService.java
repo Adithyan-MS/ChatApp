@@ -27,17 +27,19 @@ public class RoomService {
     private final ParticipantModelRepository participantModelRepository;
     private final ImageService imageService;
     private final RoomLogRepository roomLogRepository;
+    private final MessageService messageService;
 
     @Autowired
-    public RoomService(RoomRepository roomRepository, UserRepository userRepository, ParticipantModelRepository participantModelRepository, ImageService imageService, RoomLogRepository roomLogRepository){
+    public RoomService(RoomRepository roomRepository, UserRepository userRepository, ParticipantModelRepository participantModelRepository, ImageService imageService, RoomLogRepository roomLogRepository, MessageService messageService){
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
         this.participantModelRepository = participantModelRepository;
         this.imageService = imageService;
         this.roomLogRepository = roomLogRepository;
+        this.messageService = messageService;
     }
 
-    public RoomModel createRoom(CreateRoomRequest createRoomRequest) {
+    public RoomModel createRoom(CreateRoomRequest createRoomRequest) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if (currentUser != null) {
             if(!roomRepository.existByRoomName(createRoomRequest.getName()).isEmpty()){
@@ -60,6 +62,7 @@ public class RoomService {
 
                 setRoomLog(room,currentUser,RoomAction.join);
                 setRoomLog(room,currentUser,RoomAction.madeAdmin);
+                setRoomEvent(room,"created room "+room.getName());
 
                 for (Integer participant : createRoomRequest.getParticipants()) {
                     UserModel user = userRepository.findById(participant).orElse(null);
@@ -73,6 +76,7 @@ public class RoomService {
                         participantModelRepository.save(participantModel1);
 
                         setRoomLog(room,user,RoomAction.join);
+                        setRoomEvent(room,"added "+user.getName());
                     }
                 }
                 return room;
@@ -80,6 +84,19 @@ public class RoomService {
         }else{
             throw new UserNotFoundException("User not Found!");
         }
+    }
+
+    private void setRoomEvent(RoomModel room, String messagecontent) throws IllegalAccessException {
+        Message message = new Message();
+        message.setContent(messagecontent);
+        message.setType(MessageType.roomEvent);
+        Receiver receiver = new Receiver();
+        receiver.setType(ReceiverType.room);
+        receiver.setId(room.getId());
+        MessageSendRequest messageSendRequest = new MessageSendRequest();
+        messageSendRequest.setMessage(message);
+        messageSendRequest.setReceiver(receiver);
+        messageService.sendMessage(messageSendRequest);
     }
 
     public String addMember(Integer roomId,List<Integer> memberIds) throws IllegalAccessException {
@@ -102,6 +119,7 @@ public class RoomService {
                                     participantModelRepository.save(participant);
 
                                     setRoomLog(room,user,RoomAction.join);
+                                    setRoomEvent(room,"added "+user.getName());
                                     return "user joined.";
                                 }
                             }else{
@@ -114,6 +132,7 @@ public class RoomService {
                                 participantModelRepository.save(newParticipant);
 
                                 setRoomLog(room,user,RoomAction.join);
+                                setRoomEvent(room,"added "+user.getName());
                                 response = response + "\n" + "User "+memberId+" successfully added.";
                             }
                         }else{
@@ -139,8 +158,9 @@ public class RoomService {
                 String response="";
                 for (Integer memberId : memberIds){
                     if(participantModelRepository.existsRoomParticipant(roomId,memberId)!=0){
-                        participantModelRepository.deactivateParticipant(roomId,memberId, Timestamp.valueOf(LocalDateTime.now()));
                         Optional<UserModel> user = userRepository.findById(memberId);
+                        setRoomEvent(room,"removed "+user.get().getName());
+                        participantModelRepository.deactivateParticipant(roomId,memberId, Timestamp.valueOf(LocalDateTime.now()));
                         setRoomLog(room,user.get(),RoomAction.leave);
                         response = response+"\n"+memberId+" removed";
                     }else{
@@ -157,7 +177,7 @@ public class RoomService {
         }
     }
 
-    public String joinRoom(Integer roomId){
+    public String joinRoom(Integer roomId) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
@@ -172,6 +192,7 @@ public class RoomService {
                     participantModelRepository.save(participant);
 
                     setRoomLog(room,currentUser,RoomAction.join);
+                    setRoomEvent(room,"joined");
                     return "user joined.";
                 }
             }else{
@@ -184,6 +205,7 @@ public class RoomService {
                 participantModelRepository.save(newParticipant);
 
                 setRoomLog(room,currentUser,RoomAction.join);
+                setRoomEvent(room,"joined");
                 return "user joined.";
             }
         }
@@ -198,16 +220,16 @@ public class RoomService {
         if(room!=null){
             if(participantModelRepository.isUserAdmin(roomId, currentUser.getId()).orElse(false)){
                 if(participantModelRepository.getRoomAdminCount(roomId)>1){
+                    setRoomEvent(room,"left");
                     participantModelRepository.deactivateParticipant(roomId, currentUser.getId(),Timestamp.valueOf(LocalDateTime.now()));
-
                     setRoomLog(room,currentUser,RoomAction.leave);
                     return "user exited from room.";
                 }else{
                     throw new IllegalAccessException("Can't exit, you are the only admin!");
                 }
             }else{
+                setRoomEvent(room,"left");
                 participantModelRepository.deactivateParticipant(roomId, currentUser.getId(), Timestamp.valueOf(LocalDateTime.now()));
-
                 setRoomLog(room,currentUser,RoomAction.leave);
                 return "user exited from room.";
             }
@@ -226,6 +248,7 @@ public class RoomService {
                     if(participantModelRepository.makeRoomAdmin(roomId,otherUserId)>0){
                         UserModel user = userRepository.findById(otherUserId).orElse(null);
                         setRoomLog(room,user,RoomAction.madeAdmin);
+                        setRoomEvent(room,"made "+user.getName()+" an admin");
                         return "User " + otherUserId + " is now an Admin";
                     }else{
                         throw new InvalidDataException("User " + otherUserId + " can't be an Admin");
@@ -252,6 +275,7 @@ public class RoomService {
                     if(participantModelRepository.dismissRoomAdmin(roomId,otherUserId)>0){
                         UserModel user = userRepository.findById(otherUserId).orElse(null);
                         setRoomLog(room,user,RoomAction.dismissAdmin);
+                        setRoomEvent(room,"dismissed "+user.getName()+" as admin");
                         return "User " + otherUserId + " is successfully dismissed as Admin";
                     }else{
                         throw new InvalidDataException("User " + otherUserId + " can't be dismissed as Admin!");

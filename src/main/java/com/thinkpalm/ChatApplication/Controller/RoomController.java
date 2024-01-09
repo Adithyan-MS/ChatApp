@@ -28,7 +28,7 @@ public class RoomController {
     }
 
     @PostMapping("/createRoom")
-    public ResponseEntity<RoomModel> createRoom(@RequestBody CreateRoomRequest createRoomRequest){
+    public ResponseEntity<RoomModel> createRoom(@RequestBody CreateRoomRequest createRoomRequest) throws IllegalAccessException {
         return new ResponseEntity<>(roomService.createRoom(createRoomRequest),HttpStatus.OK);
     }
 
@@ -43,7 +43,7 @@ public class RoomController {
     }
 
     @PostMapping("/{roomId}/join")
-    public ResponseEntity<String> joinRoom(@PathVariable Integer roomId){
+    public ResponseEntity<String> joinRoom(@PathVariable Integer roomId) throws IllegalAccessException {
         return new ResponseEntity<>(roomService.joinRoom(roomId),HttpStatus.OK);
     }
 

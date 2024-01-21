@@ -101,7 +101,7 @@ public class MessageService {
             MessageSendRequest messageSendRequest = getMessageSendRequestJSON(messageSendRequestText);
             Arrays.asList(files).stream().forEach(file -> {
                 try {
-                    String fileName = uploadFile(file, currentUser.getName(),messageSendRequest.getMessage().getType());
+                    String fileName = uploadFile(file, currentUser.getId(),messageSendRequest.getMessage().getType());
                     messageSendRequest.getMessage().setContent(fileName);
                     sendMessage(messageSendRequest);
                 } catch (IOException e) {
@@ -142,11 +142,11 @@ public class MessageService {
         return messageModel;
     }
 
-    public String uploadFile(MultipartFile multipartFile,String name,MessageType messageType) throws IOException {
+    public String uploadFile(MultipartFile multipartFile,Integer userId,MessageType messageType) throws IOException {
         if(!multipartFile.isEmpty()){
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String formattedDateTime = dateFormat.format(new Date());
-            String filePath = uploadDirectory + "/" + name + "/" + messageType;
+            String filePath = uploadDirectory + "/user_" + userId + "/" + messageType;
             try {
                 File directory = new File(filePath);
                 if (!directory.exists()) {
@@ -157,7 +157,7 @@ public class MessageService {
                 byte[] bytes = multipartFile.getBytes();
                 Files.write(path, bytes);
 
-                String relativePath = name + "/" + messageType + "/" + fileName;
+                String relativePath = userId + "/" + messageType + "/" + fileName;
 
                 return fileName;
             } catch (IOException e) {
@@ -176,10 +176,10 @@ public class MessageService {
             if(originalMessage != null){
                 if (originalMessage.getType()!=MessageType.text){
                     try{
-                        byte[] fileBytes = viewFile(originalMessage.getContent(),originalMessage.getSender().getName(),originalMessage.getType().toString());
+                        byte[] fileBytes = viewFile(originalMessage.getContent(),"user_"+originalMessage.getSender().getId(),originalMessage.getType().toString());
                         originalMessage.setContent(extractFileName(originalMessage.getContent()));
                         MultipartFile multipartFile = new BASE64DecodedMultipartFile(fileBytes,originalMessage.getContent());
-                        String newContent = uploadFile(multipartFile,currentUser.getName(),originalMessage.getType());
+                        String newContent = uploadFile(multipartFile,currentUser.getId(),originalMessage.getType());
                         originalMessage.setContent(newContent);
                     } catch (IOException e) {
                         throw new RuntimeException(e);

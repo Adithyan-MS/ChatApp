@@ -1,13 +1,15 @@
 package com.thinkpalm.ChatApplication.Service;
 
-import com.thinkpalm.ChatApplication.Exception.InvalidDataException;
+import com.thinkpalm.ChatApplication.Exception.RoomNotFoundException;
 import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
+import com.thinkpalm.ChatApplication.Model.RoomAction;
 import com.thinkpalm.ChatApplication.Repository.ParticipantModelRepository;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Model.RoomModel;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Repository.RoomRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,11 +29,14 @@ public class ImageService {
 
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final RoomService roomService;
     private final ParticipantModelRepository participantModelRepository;
 
-    public ImageService(UserRepository userRepository, RoomRepository roomRepository, ParticipantModelRepository participantModelRepository){
+    @Autowired
+    public ImageService(UserRepository userRepository, RoomRepository roomRepository, RoomService roomService, ParticipantModelRepository participantModelRepository){
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
+        this.roomService = roomService;
         this.participantModelRepository = participantModelRepository;
     }
 
@@ -39,10 +44,9 @@ public class ImageService {
         if(!multipartFile.isEmpty()){
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String formattedDateTime = dateFormat.format(new Date());
-
             UserModel user = userRepository.findByName(AppContext.getUserName()).orElse(null);
             if (user != null) {
-                String filePath = uploadDirectory + "/" + user.getName() + "/";
+                String filePath = uploadDirectory + "/user_" + user.getId() + "/";
                 try {
                     File directory = new File(filePath);
                     if (!directory.exists()) {
@@ -55,7 +59,6 @@ public class ImageService {
 
                     user.setProfilePic(fileName);
                     userRepository.save(user);
-                    String relativePath = user.getName() + "/" + fileName;
 
                     return fileName;
                 } catch (IOException e) {
@@ -71,13 +74,13 @@ public class ImageService {
 
     public String uploadPicture(Integer roomId,MultipartFile multipartFile) throws IllegalAccessException, IOException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
-        if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
+        if(participantModelRepository.isUserActiveAdmin(roomId,currentUser.getId()).orElse(false)){
             if(!multipartFile.isEmpty()){
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
                 String formattedDateTime = dateFormat.format(new Date());
                 RoomModel room = roomRepository.findById(roomId).orElse(null);
                 if (room != null) {
-                    String filePath = uploadDirectory + "/" + room.getName() + "/";
+                    String filePath = uploadDirectory + "/room_" + room.getId() + "/";
                     try {
                         File directory = new File(filePath);
                         if (!directory.exists()) {
@@ -90,14 +93,16 @@ public class ImageService {
 
                         room.setRoom_pic(fileName);
                         roomRepository.save(room);
-                        String relativePath = room.getName() + "/" + fileName;
+
+                        this.roomService.setRoomLog(room,currentUser, RoomAction.changeRoomPicture);
+                        this.roomService.setRoomEvent(room,"changed room picture");
 
                         return fileName;
                     } catch (IOException e) {
                         throw new IOException();
                     }
                 }else{
-                    throw new UserNotFoundException("User Not Found!");
+                    throw new RoomNotFoundException("Room Not Found!");
                 }
             }else{
                 throw new FileNotFoundException();

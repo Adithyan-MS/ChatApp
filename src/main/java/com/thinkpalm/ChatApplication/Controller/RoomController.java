@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -77,13 +78,22 @@ public class RoomController {
         return new ResponseEntity<>(roomService.getPastRoomParticipants(roomId),HttpStatus.OK);
     }
 
-    @GetMapping("/{roomName}")
-    public  ResponseEntity<RoomModel> getroomDetails(@PathVariable String roomName){
-        return new ResponseEntity<>(roomService.getRoomDetails(roomName),HttpStatus.OK);
+    @GetMapping("/{roomId}")
+    public  ResponseEntity<RoomModel> getroomDetails(@PathVariable Integer roomId){
+        return new ResponseEntity<>(roomService.getRoomDetails(roomId),HttpStatus.OK);
     }
     @PostMapping("/{roomId}/delete")
     public  ResponseEntity<String> deleteRoomforUser(@PathVariable Integer roomId){
         return new ResponseEntity<>(roomService.deleteRoomforUser(roomId),HttpStatus.OK);
     }
+    @PostMapping("/{roomId}/change/name")
+    public  ResponseEntity<String> changeRoomName(@PathVariable Integer roomId,@RequestBody Map<String,String> roomNameChangeRequest) throws IllegalAccessException {
+        return new ResponseEntity<>(roomService.changeName(roomId,roomNameChangeRequest.get("name")),HttpStatus.OK);
+    }
+    @PostMapping("/{roomId}/change/desc")
+    public  ResponseEntity<String> changeDescriptionName(@PathVariable Integer roomId,@RequestBody Map<String,String> roomDescriptionChangeRequest) throws IllegalAccessException {
+        return new ResponseEntity<>(roomService.changeDescription(roomId,roomDescriptionChangeRequest.get("description")),HttpStatus.OK);
+    }
+
 
 }

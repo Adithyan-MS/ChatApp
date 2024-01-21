@@ -4,6 +4,9 @@ public enum RoomAction {
     join,
     leave,
     madeAdmin,
-    dismissAdmin
+    dismissAdmin,
+    changeRoomName,
+    changeRoomDescription,
+    changeRoomPicture
 
 }

@@ -21,6 +21,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,In
             "    m1.content AS parent_message_content,\n" +
             "    m1.type AS parent_message_type,\n" +
             "    u1.name AS parent_message_sender,\n" +
+            "    u1.id AS parent_message_sender_id,\n" +
             "    m.like_count,\n" +
             "    m.created_at,\n" +
             "    m.modified_at\n" +
@@ -79,6 +80,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,In
             "    m1.content AS parent_message_content,\n" +
             "    m1.type AS parent_message_type,\n" +
             "    u1.name AS parent_message_sender,\n" +
+            "    u1.id AS parent_message_sender_id,\n" +
             "    m.like_count,\n" +
             "    m.created_at,\n" +
             "    m.modified_at\n" +

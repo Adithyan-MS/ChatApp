@@ -27,16 +27,14 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
     private final ParticipantModelRepository participantModelRepository;
-    private final ImageService imageService;
     private final RoomLogRepository roomLogRepository;
     private final MessageService messageService;
 
     @Autowired
-    public RoomService(RoomRepository roomRepository, UserRepository userRepository, ParticipantModelRepository participantModelRepository, ImageService imageService, RoomLogRepository roomLogRepository, MessageService messageService){
+    public RoomService(RoomRepository roomRepository, UserRepository userRepository, ParticipantModelRepository participantModelRepository, RoomLogRepository roomLogRepository, MessageService messageService){
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
         this.participantModelRepository = participantModelRepository;
-        this.imageService = imageService;
         this.roomLogRepository = roomLogRepository;
         this.messageService = messageService;
     }
@@ -64,7 +62,7 @@ public class RoomService {
 
                 setRoomLog(room,currentUser,RoomAction.join);
                 setRoomLog(room,currentUser,RoomAction.madeAdmin);
-                setRoomEvent(room,"created room "+room.getName());
+                setRoomEvent(room,"created room \""+room.getName()+"\"");
 
                 for (Integer participant : createRoomRequest.getParticipants()) {
                     UserModel user = userRepository.findById(participant).orElse(null);
@@ -88,7 +86,7 @@ public class RoomService {
         }
     }
 
-    private void setRoomEvent(RoomModel room, String messagecontent) throws IllegalAccessException {
+    public void setRoomEvent(RoomModel room, String messagecontent) throws IllegalAccessException {
         Message message = new Message();
         message.setContent(messagecontent);
         message.setType(MessageType.roomEvent);
@@ -105,7 +103,7 @@ public class RoomService {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
-                if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
+                if(participantModelRepository.isUserActiveAdmin(roomId,currentUser.getId()).orElse(false)){
                     String response="";
                     for (Integer memberId : memberIds){
                         UserModel user = userRepository.findById(memberId).orElse(null);
@@ -156,7 +154,7 @@ public class RoomService {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
-            if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
+            if(participantModelRepository.isUserActiveAdmin(roomId,currentUser.getId()).orElse(false)){
                 String response="";
                 for (Integer memberId : memberIds){
                     if(participantModelRepository.existsRoomParticipant(roomId,memberId)!=0){
@@ -220,7 +218,7 @@ public class RoomService {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
-            if(participantModelRepository.isUserAdmin(roomId, currentUser.getId()).orElse(false)){
+            if(participantModelRepository.isUserActiveAdmin(roomId, currentUser.getId()).orElse(false)){
                 if(participantModelRepository.getRoomAdminCount(roomId)>1){
                     setRoomEvent(room,"left");
                     participantModelRepository.deactivateParticipant(roomId, currentUser.getId(),Timestamp.valueOf(LocalDateTime.now()));
@@ -245,8 +243,8 @@ public class RoomService {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
-            if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
-                if(!participantModelRepository.isUserAdmin(roomId,otherUserId).orElse(false)){
+            if(participantModelRepository.isUserActiveAdmin(roomId,currentUser.getId()).orElse(false)){
+                if(!participantModelRepository.isUserActiveAdmin(roomId,otherUserId).orElse(false)){
                     if(participantModelRepository.makeRoomAdmin(roomId,otherUserId)>0){
                         UserModel user = userRepository.findById(otherUserId).orElse(null);
                         setRoomLog(room,user,RoomAction.madeAdmin);
@@ -272,8 +270,8 @@ public class RoomService {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
-            if(participantModelRepository.isUserAdmin(roomId,currentUser.getId()).orElse(false)){
-                if(participantModelRepository.isUserAdmin(roomId,otherUserId).orElse(false)){
+            if(participantModelRepository.isUserActiveAdmin(roomId,currentUser.getId()).orElse(false)){
+                if(participantModelRepository.isUserActiveAdmin(roomId,otherUserId).orElse(false)){
                     if(participantModelRepository.dismissRoomAdmin(roomId,otherUserId)>0){
                         UserModel user = userRepository.findById(otherUserId).orElse(null);
                         setRoomLog(room,user,RoomAction.dismissAdmin);
@@ -295,6 +293,54 @@ public class RoomService {
         }
     }
 
+    public String changeName(Integer roomId,String name) throws IllegalAccessException {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        String previousName = room.getName();
+        if(room!=null){
+            if(participantModelRepository.isUserActiveAdmin(roomId,currentUser.getId()).orElse(false)){
+                try{
+                    roomRepository.updateRoomName(roomId,name);
+                    setRoomLog(room,currentUser,RoomAction.changeRoomName);
+                    setRoomEvent(room,"changed the room name from \"" +previousName+"\" to \""+name+"\"");
+                    return "room name updated!";
+                }catch (InvalidDataException e){
+                    throw new InvalidDataException("failed to change room name!");
+                }
+
+            }
+            else {
+                throw new IllegalAccessException("You are not an Admin!");
+            }
+        }
+        else{
+            throw new RoomNotFoundException("Room Not Found");
+        }
+    }
+
+    public String changeDescription(Integer roomId,String description) throws IllegalAccessException {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if(room!=null){
+            if(participantModelRepository.isUserActiveAdmin(roomId,currentUser.getId()).orElse(false)){
+                try{
+                    roomRepository.updateRoomDescription(roomId,description);
+                    setRoomLog(room,currentUser,RoomAction.changeRoomDescription);
+                    setRoomEvent(room,"changed the room description");
+                    return "room description updated!";
+                }catch (InvalidDataException e){
+                    throw new InvalidDataException("failed to change room description!");
+                }
+            }
+            else {
+                throw new IllegalAccessException("You are not an Admin!");
+            }
+        }
+        else{
+            throw new RoomNotFoundException("Room Not Found");
+        }
+    }
+
     public List<Map<String, Object>> getRoomParticipants(Integer roomId){
         return participantModelRepository.getRoomParticipants(roomId);
     }
@@ -303,8 +349,8 @@ public class RoomService {
         return participantModelRepository.getPastRoomParticipants(roomId);
     }
 
-    public RoomModel getRoomDetails(String roomName) {
-        RoomModel room = roomRepository.findByName(roomName);
+    public RoomModel getRoomDetails(Integer roomId) {
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
         if(room!=null){
             return room;
         }else{

@@ -15,6 +15,7 @@ import org.overviewproject.mime_types.App;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,6 +40,20 @@ public class RoomService {
         this.messageService = messageService;
     }
 
+    private static final String CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final int CODE_LENGTH = 8;
+
+    public static String generateRandomCode() {
+        SecureRandom random = new SecureRandom();
+        StringBuilder code = new StringBuilder(CODE_LENGTH);
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            char randomChar = CHARACTERS.charAt(randomIndex);
+            code.append(randomChar);
+        }
+        return code.toString();
+    }
+
     public RoomModel createRoom(CreateRoomRequest createRoomRequest) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if (currentUser != null) {
@@ -49,6 +64,7 @@ public class RoomService {
                 room.setName(createRoomRequest.getName());
                 room.setDescription(createRoomRequest.getDesc());
                 room.setRoom_pic(createRoomRequest.getPic());
+                room.setRoom_code(generateRandomCode());
                 room.setCreatedBy(currentUser);
                 roomRepository.save(room);
 

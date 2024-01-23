@@ -63,6 +63,14 @@ public class RoomController {
         return new ResponseEntity<>(roomService.dismissRoomAdmin(roomId,otherUserId),HttpStatus.OK);
     }
 
+    @GetMapping("/{roomId}/getRoomCode")
+    public ResponseEntity<String> getRoomCode(@PathVariable Integer roomId) throws IllegalAccessException {
+        return new ResponseEntity<>(roomService.getRoomCode(roomId),HttpStatus.OK);
+    }
+    @GetMapping("/roomCode/{roomCode}")
+    public ResponseEntity<Map<String,Object>> getRoomByRoomCode(@PathVariable String roomCode) throws IllegalAccessException {
+        return new ResponseEntity<>(roomService.getRoomByRoomCode(roomCode),HttpStatus.OK);
+    }
     @GetMapping("/{roomId}/isParticipant/{userId}")
     public ResponseEntity<Boolean> IsUserPartcicpant(@PathVariable Integer roomId,@PathVariable Integer userId){
         return new ResponseEntity<>(roomService.IsUserPartcicpant(roomId,userId),HttpStatus.OK);

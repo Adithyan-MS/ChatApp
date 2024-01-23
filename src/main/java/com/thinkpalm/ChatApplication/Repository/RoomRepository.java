@@ -23,4 +23,6 @@ public interface RoomRepository extends JpaRepository<RoomModel,Integer> {
     @Modifying
     @Query(value = "UPDATE room SET description = ?2 WHERE id = ?1",nativeQuery = true)
     void updateRoomDescription(Integer roomId, String name);
+    @Query(value = "SELECT id,name,description,room_pic FROM chatdb.room where room.room_code = ?1",nativeQuery = true)
+    Map<String, Object> findRoomByRoomCode(String roomCode);
 }

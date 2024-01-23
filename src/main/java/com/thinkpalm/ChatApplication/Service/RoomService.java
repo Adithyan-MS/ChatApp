@@ -230,6 +230,20 @@ public class RoomService {
         }
     }
 
+    public String getRoomCode(Integer roomId) throws IllegalAccessException {
+        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if(room!=null){
+            if(participantModelRepository.isUserActiveAdmin(roomId,currentUser.getId()).orElse(false)){
+                return room.getRoom_code();
+            }else{
+                throw new IllegalAccessException("You are not an Admin!");
+            }
+        }else{
+            throw new RoomNotFoundException("Room Not Found!");
+        }
+    }
+
     public String exitRoom(Integer roomId) throws IllegalAccessException {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel room = roomRepository.findById(roomId).orElse(null);
@@ -414,5 +428,14 @@ public class RoomService {
         roomLog.setAction(action);
         roomLog.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
         roomLogRepository.save(roomLog);
+    }
+
+    public Map<String, Object> getRoomByRoomCode(String roomCode) {
+        Map<String, Object> roomResp =  roomRepository.findRoomByRoomCode(roomCode);
+        if(!roomResp.isEmpty()){
+            return roomResp;
+        }else{
+            throw new RoomNotFoundException("Room Not Found!");
+        }
     }
 }

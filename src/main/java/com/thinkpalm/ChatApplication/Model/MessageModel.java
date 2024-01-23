@@ -19,7 +19,7 @@ public class MessageModel extends Auditable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column
+    @Column(length = 1000)
     @NonNull
     private String content;
 

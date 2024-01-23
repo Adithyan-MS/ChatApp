@@ -2,6 +2,7 @@ package com.thinkpalm.ChatApplication.Model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.thinkpalm.ChatApplication.Validation.BioDescValid;
 import com.thinkpalm.ChatApplication.Validation.EmailValid;
 import com.thinkpalm.ChatApplication.Validation.NameValid;
 import com.thinkpalm.ChatApplication.Validation.PasswordValid;
@@ -9,7 +10,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -46,7 +46,7 @@ public class UserModel extends Auditable{
     private String phone_number;
 
     @Column
-    @Size(max = 200)
+    @BioDescValid
     private String bio;
 
     @Column

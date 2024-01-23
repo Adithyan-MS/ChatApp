@@ -1,9 +1,9 @@
 package com.thinkpalm.ChatApplication.Controller;
 
-import com.thinkpalm.ChatApplication.Model.CreateRoomRequest;
-import com.thinkpalm.ChatApplication.Model.RoomModel;
+import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Service.ImageService;
 import com.thinkpalm.ChatApplication.Service.RoomService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class RoomController {
     }
 
     @PostMapping("/createRoom")
-    public ResponseEntity<RoomModel> createRoom(@RequestBody CreateRoomRequest createRoomRequest) throws IllegalAccessException {
+    public ResponseEntity<RoomModel> createRoom(@Valid @RequestBody CreateRoomRequest createRoomRequest) throws IllegalAccessException {
         return new ResponseEntity<>(roomService.createRoom(createRoomRequest),HttpStatus.OK);
     }
 
@@ -95,12 +95,12 @@ public class RoomController {
         return new ResponseEntity<>(roomService.deleteRoomforUser(roomId),HttpStatus.OK);
     }
     @PostMapping("/{roomId}/change/name")
-    public  ResponseEntity<String> changeRoomName(@PathVariable Integer roomId,@RequestBody Map<String,String> roomNameChangeRequest) throws IllegalAccessException {
-        return new ResponseEntity<>(roomService.changeName(roomId,roomNameChangeRequest.get("name")),HttpStatus.OK);
+    public  ResponseEntity<String> changeRoomName(@PathVariable Integer roomId,@Valid @RequestBody RoomNameChangeRequest roomNameChangeRequest) throws IllegalAccessException {
+        return new ResponseEntity<>(roomService.changeName(roomId,roomNameChangeRequest.getName()),HttpStatus.OK);
     }
     @PostMapping("/{roomId}/change/desc")
-    public  ResponseEntity<String> changeDescriptionName(@PathVariable Integer roomId,@RequestBody Map<String,String> roomDescriptionChangeRequest) throws IllegalAccessException {
-        return new ResponseEntity<>(roomService.changeDescription(roomId,roomDescriptionChangeRequest.get("description")),HttpStatus.OK);
+    public  ResponseEntity<String> changeDescriptionName(@PathVariable Integer roomId,@Valid @RequestBody RoomDescChangeRequest roomDescriptionChangeRequest) throws IllegalAccessException {
+        return new ResponseEntity<>(roomService.changeDescription(roomId,roomDescriptionChangeRequest.getDescription()),HttpStatus.OK);
     }
 
 

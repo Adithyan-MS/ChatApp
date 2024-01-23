@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Service;
 
+import com.thinkpalm.ChatApplication.Model.UpdateBioRequest;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Model.UserModel;
@@ -63,8 +64,8 @@ class UserServiceTest {
                 .password("wick123")
                 .phone_number("0023453213")
                 .build();
-        Map<String,String> request = new HashMap();
-        request.put("bio","some bio");
+        UpdateBioRequest request = new UpdateBioRequest();
+        request.setBio("some bio");
         try (MockedStatic mocked = mockStatic(AppContext.class)) {
             when(AppContext.getUserName()).thenReturn(user.getName());
             assertEquals(userService.updateUserBio(request),"Bio updated");
@@ -79,8 +80,8 @@ class UserServiceTest {
                 .password("wick123")
                 .phone_number("0023453213")
                 .build();
-        Map<String,String> request = new HashMap();
-        request.put("bio","some bio");
+        UpdateBioRequest request = new UpdateBioRequest();
+        request.setBio("some bio");
         try (MockedStatic mocked = mockStatic(AppContext.class)) {
             when(AppContext.getUserName()).thenReturn("");
             assertThrows(UserNotFoundException.class,

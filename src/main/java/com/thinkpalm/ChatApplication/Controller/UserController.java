@@ -1,13 +1,16 @@
 package com.thinkpalm.ChatApplication.Controller;
 
 import com.thinkpalm.ChatApplication.Model.RoomModel;
+import com.thinkpalm.ChatApplication.Model.UpdateBioRequest;
 import com.thinkpalm.ChatApplication.Model.UserModel;
 import com.thinkpalm.ChatApplication.Service.ImageService;
 import com.thinkpalm.ChatApplication.Service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,7 +52,7 @@ public class UserController {
     }
 
     @PostMapping("/update/bio")
-    public ResponseEntity<String> updateUserBio(@RequestBody Map<String,String> request){
+    public ResponseEntity<String> updateUserBio(@Valid @RequestBody UpdateBioRequest request){
         return new ResponseEntity<>(userService.updateUserBio(request),HttpStatus.OK);
     }
 

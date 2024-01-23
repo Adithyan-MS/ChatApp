@@ -1,5 +1,6 @@
 package com.thinkpalm.ChatApplication.Model;
 
+import com.thinkpalm.ChatApplication.Validation.RoomNameValid;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class RoomModel extends Auditable{
     private Integer id;
 
     @Column
+    @RoomNameValid
     private String name;
 
     @Column

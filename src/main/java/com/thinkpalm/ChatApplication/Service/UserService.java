@@ -1,6 +1,7 @@
 package com.thinkpalm.ChatApplication.Service;
 
 import com.thinkpalm.ChatApplication.Model.RoomModel;
+import com.thinkpalm.ChatApplication.Model.UpdateBioRequest;
 import com.thinkpalm.ChatApplication.Util.AppContext;
 import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Model.UserModel;
@@ -33,11 +34,11 @@ public class UserService {
         }
     }
 
-    public String updateUserBio(Map<String, String> request) {
+    public String updateUserBio(UpdateBioRequest request) {
         String currentUser = AppContext.getUserName();
         if(!currentUser.isEmpty()){
-            userRepository.updateUserBio(currentUser,request.get("bio"));
-            return request.get("bio");
+            userRepository.updateUserBio(currentUser,request.getBio());
+            return request.getBio();
         }else{
             throw new UserNotFoundException("User Not Found!");
         }

@@ -85,6 +85,10 @@ public class RoomController {
     public ResponseEntity<List<Map<String, Object>>> getPastRoomParticipants(@PathVariable Integer roomId){
         return new ResponseEntity<>(roomService.getPastRoomParticipants(roomId),HttpStatus.OK);
     }
+    @GetMapping("/{roomId}/userList")
+    public ResponseEntity<List<String>> getActiveUserList(@PathVariable Integer roomId){
+        return new ResponseEntity<>(roomService.getActiveUserList(roomId),HttpStatus.OK);
+    }
 
     @GetMapping("/{roomId}")
     public  ResponseEntity<RoomModel> getroomDetails(@PathVariable Integer roomId){

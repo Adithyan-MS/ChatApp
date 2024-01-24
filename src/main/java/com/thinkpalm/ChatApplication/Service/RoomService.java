@@ -438,4 +438,13 @@ public class RoomService {
             throw new RoomNotFoundException("Room Not Found!");
         }
     }
+
+    public List<String> getActiveUserList(Integer roomId) {
+        RoomModel room = roomRepository.findById(roomId).orElse(null);
+        if(room!=null){
+            return roomRepository.getActiveUsers(roomId);
+        }else {
+            throw new RoomNotFoundException("Room not found!");
+        }
+    }
 }

@@ -174,19 +174,19 @@ public class MessageService {
         for(Integer messageId : messageForwardRequest.getMessageIds()){
             MessageModel originalMessage = messageRepository.findById(messageId).orElse(null);
             if(originalMessage != null){
+                String originalMessageText = originalMessage.getContent();
                 if (originalMessage.getType()!=MessageType.text){
                     try{
                         byte[] fileBytes = viewFile(originalMessage.getContent(),"user_"+originalMessage.getSender().getId(),originalMessage.getType().toString());
-                        originalMessage.setContent(extractFileName(originalMessage.getContent()));
-                        MultipartFile multipartFile = new BASE64DecodedMultipartFile(fileBytes,originalMessage.getContent());
-                        String newContent = uploadFile(multipartFile,currentUser.getId(),originalMessage.getType());
-                        originalMessage.setContent(newContent);
+                        MultipartFile multipartFile = new BASE64DecodedMultipartFile(fileBytes,extractFileName(originalMessage.getContent()));
+                        originalMessageText = uploadFile(multipartFile,currentUser.getId(),originalMessage.getType());
+//                        originalMessage.setContent(newContent);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
                 MessageModel newMessage = new MessageModel();
-                newMessage.setContent(originalMessage.getContent());
+                newMessage.setContent(originalMessageText);
                 newMessage.setType(originalMessage.getType());
                 newMessage.setSender(currentUser);
                 messageRepository.save(newMessage);

@@ -165,12 +165,12 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "    max_modified_at DESC;",nativeQuery = true)
     List<Map<String, Object>> searchChats(Integer currentUserId,String searchName);
 
-    @Query(value = "SELECT r.*\n" +
-            "FROM chatdb.room r\n" +
-            "JOIN chatdb.participant p ON r.id = p.room_id\n" +
-            "WHERE p.user_id = ?1 OR p.user_id = ?2\n" +
-            "GROUP BY r.id\n" +
-            "HAVING COUNT(DISTINCT p.user_id) = 2",nativeQuery = true)
+    @Query(value = "SELECT r.id,r.name,r.room_pic\n" +
+            "     FROM chatdb.room r\n" +
+            "     JOIN chatdb.participant p ON r.id = p.room_id\n" +
+            "     WHERE ( p.user_id = ?1 AND p.is_active = true ) OR ( p.user_id = ?2 AND p.is_active = true )\n" +
+            "     GROUP BY r.id\n" +
+            "     HAVING COUNT(DISTINCT p.user_id) = 2",nativeQuery = true)
     List<Map<String, Object>> getCommonRooms(Integer id, Integer id1);
 
     @Query(value = "SELECT u.id,u.name,u.profile_pic FROM chatdb.user as u where u.name LIKE CONCAT('%',?1,'%') && u.id != ?2",nativeQuery = true)

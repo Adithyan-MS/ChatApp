@@ -94,6 +94,11 @@ public class MessageController {
         MediaType mediaType = determineContentType(filename);
         return ResponseEntity.ok().contentType(mediaType).body(messageService.viewFile(filename,name,"image"));
     }
+    @GetMapping("/view/{name}/video/{filename}")
+    public ResponseEntity<byte[]> viewVideo(@PathVariable String filename, @PathVariable String name) throws IOException {
+        MediaType mediaType = determineContentType(filename);
+        return ResponseEntity.ok().contentType(mediaType).body(messageService.viewFile(filename,name,"video"));
+    }
 
     @GetMapping("/view/{name}/document/{filename}")
     public ResponseEntity<ByteArrayResource> viewDocument(@PathVariable String filename, @PathVariable String name) {
@@ -125,6 +130,8 @@ public class MessageController {
             return MediaType.APPLICATION_PDF;
         } else if (filename.endsWith(".pdf")) {
             return MediaType.APPLICATION_PDF;
+        } else if (filename.endsWith(".mp4") || filename.endsWith(".avi")) {
+            return MediaType.valueOf("video/mp4");
         } else {
             return MediaType.APPLICATION_OCTET_STREAM;
         }

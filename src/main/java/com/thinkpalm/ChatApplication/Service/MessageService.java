@@ -94,7 +94,6 @@ public class MessageService {
             throw new UserNotFoundException("User not found!");
         }
     }
-
     public String sendFile(MultipartFile[] files,String messageSendRequestText) {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if(currentUser!=null){

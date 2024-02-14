@@ -94,21 +94,19 @@ public class MessageService {
             throw new UserNotFoundException("User not found!");
         }
     }
-    public String sendFile(MultipartFile[] files,String messageSendRequestText) {
+    public String sendFile(MultipartFile file,String messageSendRequestText) {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if(currentUser!=null){
             MessageSendRequest messageSendRequest = getMessageSendRequestJSON(messageSendRequestText);
-            Arrays.asList(files).stream().forEach(file -> {
-                try {
-                    String fileName = uploadFile(file, currentUser.getId(),messageSendRequest.getMessage().getType());
-                    messageSendRequest.getMessage().setContent(fileName);
-                    sendMessage(messageSendRequest);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            try {
+                String fileName = uploadFile(file, currentUser.getId(),messageSendRequest.getMessage().getType());
+                messageSendRequest.getMessage().setContent(fileName);
+                sendMessage(messageSendRequest);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
             return "file send Successfully";
         }else {
             throw new UserNotFoundException("User not found!");

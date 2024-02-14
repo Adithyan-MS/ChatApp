@@ -31,8 +31,8 @@ public class MessageController {
         return new ResponseEntity<>(messageService.sendMessage(msg),HttpStatus.OK);
     }
     @PostMapping("/sendFile")
-    public ResponseEntity<String> sendFile(@RequestPart("files") MultipartFile[] files, @RequestPart("messageData") String messageSendRequestText) {
-        return new ResponseEntity<>(messageService.sendFile(files,messageSendRequestText),HttpStatus.OK);
+    public ResponseEntity<String> sendFile(@RequestPart("file") MultipartFile file, @RequestPart("messageData") String messageSendRequestText) {
+        return new ResponseEntity<>(messageService.sendFile(file,messageSendRequestText),HttpStatus.OK);
     }
 
     @PostMapping("/forwardMessage")

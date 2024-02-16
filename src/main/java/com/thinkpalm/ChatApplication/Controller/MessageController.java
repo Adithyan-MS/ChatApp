@@ -99,6 +99,11 @@ public class MessageController {
         MediaType mediaType = determineContentType(filename);
         return ResponseEntity.ok().contentType(mediaType).body(messageService.viewFile(filename,name,"video"));
     }
+    @GetMapping("/view/{name}/thumbnail/{filename}")
+    public ResponseEntity<byte[]> viewthumbnail(@PathVariable String filename, @PathVariable String name) throws IOException {
+        MediaType mediaType = determineContentType(filename);
+        return ResponseEntity.ok().contentType(mediaType).body(messageService.viewFile(filename,name,"thumbnail"));
+    }
 
     @GetMapping("/view/{name}/document/{filename}")
     public ResponseEntity<ByteArrayResource> viewDocument(@PathVariable String filename, @PathVariable String name) {

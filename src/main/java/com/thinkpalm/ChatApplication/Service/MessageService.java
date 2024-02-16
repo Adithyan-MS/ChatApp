@@ -7,11 +7,17 @@ import com.thinkpalm.ChatApplication.Exception.RoomNotFoundException;
 import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
 import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.*;
+import net.coobird.thumbnailator.Thumbnails;
+import org.jcodec.api.FrameGrab;
+import org.jcodec.common.model.Picture;
+import org.jcodec.scale.AWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -100,6 +106,7 @@ public class MessageService {
             MessageSendRequest messageSendRequest = getMessageSendRequestJSON(messageSendRequestText);
             try {
                 String fileName = uploadFile(file, currentUser.getId(),messageSendRequest.getMessage().getType());
+
                 messageSendRequest.getMessage().setContent(fileName);
                 sendMessage(messageSendRequest);
             } catch (IOException e) {
@@ -154,8 +161,11 @@ public class MessageService {
                 byte[] bytes = multipartFile.getBytes();
                 Files.write(path, bytes);
 
-                String relativePath = userId + "/" + messageType + "/" + fileName;
-
+                if(messageType == MessageType.image){
+                    generateImageThumbnail(path,fileName,userId);
+                } else if (messageType == MessageType.video) {
+                    generateVideoThumbnail(path.toString(),fileName,userId);
+                }
                 return fileName;
             } catch (IOException e) {
                 throw new IOException();
@@ -165,6 +175,45 @@ public class MessageService {
         }
     }
 
+    public void generateVideoThumbnail(String videoPath, String fileName, int userId){
+        int frameNumber = 0;
+        String thumbDirectoryPath = uploadDirectory + "/user_" + userId + "/thumbnail";
+        File thumbDirectory = new File(thumbDirectoryPath);
+        if (!thumbDirectory.exists()) {
+            thumbDirectory.mkdirs();
+        }
+        Path thumbPath = Paths.get(thumbDirectoryPath, fileName);
+        try {
+            Picture picture = FrameGrab.getFrameFromFile(new File(videoPath), frameNumber);
+            BufferedImage bufferedImage = AWTUtil.toBufferedImage(picture);
+            try {
+                Thumbnails.of(bufferedImage)
+                        .scale(0.2)
+                        .toFile(thumbPath+".png");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    private void generateImageThumbnail(Path path, String fileName, int userId){
+        File file = new File(String.valueOf(path));
+        String thumbDirectoryPath = uploadDirectory + "/user_" + userId + "/thumbnail";
+        File thumbDirectory = new File(thumbDirectoryPath);
+        if (!thumbDirectory.exists()) {
+            thumbDirectory.mkdirs();
+        }
+        Path thumbPath = Paths.get(thumbDirectoryPath, fileName);
+        try {
+            Thumbnails.of(file)
+                    .scale(0.2)
+                    .toFile(thumbPath.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public String forwardMessage(MessageForwardRequest messageForwardRequest){
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);

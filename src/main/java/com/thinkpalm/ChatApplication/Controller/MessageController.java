@@ -4,6 +4,7 @@ import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,9 +55,13 @@ public class MessageController {
         return new ResponseEntity<>(messageService.deleteMessage(deleteRequest.get("messageIds")),HttpStatus.OK);
     }
 
-    @GetMapping("/user/{otherUserId}")
-    public ResponseEntity<List<Map<String, Object>>> getUserChatMessages(@PathVariable Integer otherUserId){
-        return new ResponseEntity<>(messageService.getUserChatMessages(otherUserId),HttpStatus.OK);
+//    @GetMapping("/user/{otherUserId}")
+//    public ResponseEntity<List<Map<String, Object>>> getUserChatMessages(@PathVariable Integer otherUserId){
+//        return new ResponseEntity<>(messageService.getUserChatMessages(otherUserId),HttpStatus.OK);
+//    }
+    @GetMapping("/user/{otherUserId}/page/{pageNumber}")
+    public ResponseEntity<List<Map<String, Object>>> getPaginatedUserChatMessages(@PathVariable Integer otherUserId, @PathVariable Integer pageNumber){
+        return new ResponseEntity<>(messageService.getPaginatedUserChatMessages(otherUserId,pageNumber),HttpStatus.OK);
     }
 
     @GetMapping("/user/{otherUserId}/search")
@@ -69,9 +74,14 @@ public class MessageController {
         return new ResponseEntity<>(messageService.searchAllChats(searchContent),HttpStatus.OK);
     }
 
-    @GetMapping("/room/{roomId}")
-    public ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable Integer roomId) throws IllegalAccessException {
-        return new ResponseEntity<>(messageService.getRoomChatMessages(roomId), HttpStatus.OK);
+//    @GetMapping("/room/{roomId}")
+//    public ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable Integer roomId) throws IllegalAccessException {
+//        return new ResponseEntity<>(messageService.getRoomChatMessages(roomId), HttpStatus.OK);
+//    }
+
+    @GetMapping("/room/{roomId}/page/{pageNumber}")
+    public ResponseEntity<List<Map<String,Object>>> getRoomChatMessages(@PathVariable Integer roomId,@PathVariable Integer pageNumber) throws IllegalAccessException {
+        return new ResponseEntity<>(messageService.getPaginatedRoomChatMessages(roomId,pageNumber), HttpStatus.OK);
     }
 
     @GetMapping("/room/{roomId}/search")

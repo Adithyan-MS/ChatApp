@@ -2,6 +2,8 @@ package com.thinkpalm.ChatApplication.Repository;
 
 import com.thinkpalm.ChatApplication.Model.MessageRoomModel;
 import com.thinkpalm.ChatApplication.Model.UserModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -65,8 +67,8 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,In
             "        (aup.leave_timestamp IS NOT NULL AND aup.join_timestamp <= m.created_at AND m.created_at <= aup.leave_timestamp)\n" +
             "    )\n" +
             "ORDER BY\n" +
-            "    m.created_at ASC",nativeQuery = true)
-    List<Map<String, Object>> getAllRoomMessages(Integer roomId, Integer userId);
+            "    m.created_at DESC",nativeQuery = true)
+    Page<Map<String, Object>> getAllPaginatedRoomMessages(Integer roomId, Integer userId, Pageable pageable);
 
     @Query(value = "SELECT DISTINCT\n" +
             "    m.id,\n" +

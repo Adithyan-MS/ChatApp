@@ -321,7 +321,7 @@ public class MessageService {
         UserModel otherUserData = userRepository.findById(otherUserId).orElse(null);
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if(otherUserData != null){
-            Pageable pageable = PageRequest.of(pageNumber,15);
+            Pageable pageable = PageRequest.of(pageNumber,30);
             Page<Map<String, Object>> page = messageReceiverRepository.getAllPaginatedUserChatMessages(currentUser.getId(), otherUserData.getId(),pageable);
             List<Map<String,Object>> messages = new ArrayList<>(page.getContent());
             Collections.reverse(messages);
@@ -336,7 +336,7 @@ public class MessageService {
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel roomData = roomRepository.findById(roomId).orElse(null);
         if(roomData != null){
-            Pageable pageable = PageRequest.of(pageNumber,15);
+            Pageable pageable = PageRequest.of(pageNumber,30);
             Page<Map<String, Object>> page = messageRoomRepository.getAllPaginatedRoomMessages(roomData.getId(),currentUser.getId(),pageable);
             List<Map<String,Object>> messages = new ArrayList<>(page.getContent());
             Collections.reverse(messages);

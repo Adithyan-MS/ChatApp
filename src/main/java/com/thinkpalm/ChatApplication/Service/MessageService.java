@@ -226,7 +226,6 @@ public class MessageService {
                         byte[] fileBytes = viewFile(originalMessage.getContent(),"user_"+originalMessage.getSender().getId(),originalMessage.getType().toString());
                         MultipartFile multipartFile = new BASE64DecodedMultipartFile(fileBytes,extractFileName(originalMessage.getContent()));
                         originalMessageText = uploadFile(multipartFile,currentUser.getId(),originalMessage.getType());
-//                        originalMessage.setContent(newContent);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

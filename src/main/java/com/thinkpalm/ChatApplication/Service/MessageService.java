@@ -188,7 +188,7 @@ public class MessageService {
             BufferedImage bufferedImage = AWTUtil.toBufferedImage(picture);
             try {
                 Thumbnails.of(bufferedImage)
-                        .scale(0.2)
+                        .scale(0.5)
                         .toFile(thumbPath+".png");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -208,7 +208,7 @@ public class MessageService {
         Path thumbPath = Paths.get(thumbDirectoryPath, fileName);
         try {
             Thumbnails.of(file)
-                    .scale(0.2)
+                    .scale(0.5)
                     .toFile(thumbPath.toString());
         } catch (IOException e) {
             e.printStackTrace();

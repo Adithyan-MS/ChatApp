@@ -46,7 +46,6 @@ public class UserModel extends Auditable{
     private String phone_number;
 
     @Column
-    @BioDescValid
     private String bio;
 
     @Column

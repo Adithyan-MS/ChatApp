@@ -10,5 +10,6 @@ public enum MessageType {
     image,
     video,
     document,
+    audio,
     roomEvent
 }

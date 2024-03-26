@@ -50,7 +50,7 @@ public interface MessageReceiverRepository extends JpaRepository<MessageReceiver
             "                ((m.sender_id = ?1 AND mr.receiver_id = ?2) OR (m.sender_id = ?2 AND mr.receiver_id = ?1))\n" +
             "                AND dm.message_id IS NULL\n" +
             "            ORDER BY m.created_at DESC",nativeQuery = true)
-    Page<Map<String, Object>> getAllPaginatedUserChatMessages(Integer currentUserId, Integer otherUserId, Pageable pageable);
+    List<Map<String,Object>> getAllUserChatMessages(Integer currentUserId, Integer otherUserId);
 
     @Query(value = "SELECT m.id, m.content, m.type, m.sender_id, u.name as sender_name,case when sm.id is null then 0 else 1 end as is_starred, m.parent_message_id,u1.name as parent_message_sender, u1.id as parent_message_sender_id, m1.content as parent_message_content,m1.type as parent_message_type, m.like_count, m.created_at, m.modified_at\n" +
             "FROM chatdb.message AS m\n" +

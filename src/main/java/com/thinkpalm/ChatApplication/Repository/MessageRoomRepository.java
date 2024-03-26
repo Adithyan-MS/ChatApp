@@ -68,7 +68,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,In
             "    )\n" +
             "ORDER BY\n" +
             "    m.created_at DESC",nativeQuery = true)
-    Page<Map<String, Object>> getAllPaginatedRoomMessages(Integer roomId, Integer userId, Pageable pageable);
+    List<Map<String,Object>> getAllRoomMessages(Integer roomId, Integer userId);
 
     @Query(value = "SELECT DISTINCT\n" +
             "    m.id,\n" +

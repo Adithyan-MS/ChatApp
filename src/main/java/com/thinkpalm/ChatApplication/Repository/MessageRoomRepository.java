@@ -67,7 +67,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoomModel,In
             "        (aup.leave_timestamp IS NOT NULL AND aup.join_timestamp <= m.created_at AND m.created_at <= aup.leave_timestamp)\n" +
             "    )\n" +
             "ORDER BY\n" +
-            "    m.created_at DESC",nativeQuery = true)
+            "    m.created_at",nativeQuery = true)
     List<Map<String,Object>> getAllRoomMessages(Integer roomId, Integer userId);
 
     @Query(value = "SELECT DISTINCT\n" +

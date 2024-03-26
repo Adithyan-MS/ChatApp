@@ -316,21 +316,6 @@ public class MessageService {
         }
     }
 
-//    public List<Map<String,Object>> getPaginatedUserChatMessages(Integer otherUserId, Integer pageNumber){
-//        UserModel otherUserData = userRepository.findById(otherUserId).orElse(null);
-//        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
-//        if(otherUserData != null){
-//            Pageable pageable = PageRequest.of(pageNumber,20);
-//            Page<Map<String, Object>> page = messageReceiverRepository.getAllPaginatedUserChatMessages(currentUser.getId(), otherUserData.getId(),pageable);
-//            List<Map<String,Object>> messages = new ArrayList<>(page.getContent());
-//            Collections.reverse(messages);
-//            return messages;
-//        }
-//        else{
-//            throw new UserNotFoundException("No user with Id : "+otherUserId);
-//        }
-//    }
-
     public List<Map<String,Object>> getRoomChatMessages(Integer roomId) throws IllegalAccessException {        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel roomData = roomRepository.findById(roomId).orElse(null);
         if(roomData != null){

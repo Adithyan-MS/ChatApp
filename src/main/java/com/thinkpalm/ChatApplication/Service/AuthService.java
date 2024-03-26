@@ -2,10 +2,7 @@ package com.thinkpalm.ChatApplication.Service;
 
 import com.thinkpalm.ChatApplication.Exception.DuplicateEntryException;
 import com.thinkpalm.ChatApplication.Exception.UserNotFoundException;
-import com.thinkpalm.ChatApplication.Model.LoginRequest;
-import com.thinkpalm.ChatApplication.Model.Token;
-import com.thinkpalm.ChatApplication.Model.TokenType;
-import com.thinkpalm.ChatApplication.Model.UserModel;
+import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.TokenRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

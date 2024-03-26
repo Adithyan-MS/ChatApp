@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-
 @RequestMapping("/chatApi/v1/auth")
 public class AuthController {
 
@@ -25,16 +24,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Object> userRegister(@RequestBody @Valid UserModel user){
+    public ResponseEntity<Object> userRegister(@RequestBody  UserModel user){
         return new ResponseEntity<>(authService.registerUser(user), HttpStatus.OK);
     }
     @PostMapping("/login")
     public ResponseEntity<Map<String,String>> userLogin(@RequestBody LoginRequest loginRequest){
         return new ResponseEntity<>(authService.loginUser(loginRequest),HttpStatus.OK);
-    }
-    @GetMapping("/logoutSuccess")
-    public ResponseEntity<String> logoutSuccess(){
-        return new ResponseEntity<>("Success:)",HttpStatus.OK);
     }
 
 }

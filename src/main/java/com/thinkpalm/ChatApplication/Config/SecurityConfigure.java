@@ -76,6 +76,7 @@ public class SecurityConfigure {
                                 response.setStatus(HttpServletResponse.SC_OK);
                                 response.getWriter().write("successfully Logged out");
                             }
+
                         })
                 )
                 .build();

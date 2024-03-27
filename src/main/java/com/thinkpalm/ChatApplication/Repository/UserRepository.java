@@ -27,6 +27,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "\t\tu.profile_pic,\n" +
             "\t\t'user' as type,\n" +
             "\t\tm.content as latest_message,\n" +
+            "\t\tm.id as latest_message_id,\n" +
             "\t\tm.type as latest_message_type,\n" +
             "\t\tm.sender_id as latest_message_sender_id,\n" +
             "\t\tu1.name as latest_message_sender_name,\n" +
@@ -52,6 +53,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "\t\tr.room_pic as profile_pic,\n" +
             "\t\t'room' as type,\n" +
             "\t\tm.content as latest_message,\n" +
+            "\t\tm.id as latest_message_id,\n" +
             "\t\tm.type as latest_message_type,\n" +
             "\t\tu.id as latest_message_sender_id,\n" +
             "\t\tu.name as latest_message_sender_name,\n" +
@@ -78,6 +80,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "\tprofile_pic,\n" +
             "\ttype,\n" +
             "\tlatest_message,\n" +
+            "\tlatest_message_id,\n" +
             "\tlatest_message_type,\n" +
             "\tlatest_message_sender_id,\n" +
             "\tlatest_message_sender_name,\n" +
@@ -100,6 +103,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "        u.profile_pic,\n" +
             "        'user' as type,\n" +
             "        m.content as latest_message,\n" +
+            "        m.id as latest_message_id,\n" +
             "        m.type as latest_message_type,\n" +
             "        m.sender_id as latest_message_sender_id,\n" +
             "        u1.name as latest_message_sender_name,\n" +
@@ -126,6 +130,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "        r.room_pic as profile_pic,\n" +
             "        'room' as type,\n" +
             "        m.content as latest_message,\n" +
+            "        m.id as latest_message_id,\n" +
             "        m.type as latest_message_type,\n" +
             "        u.id as latest_message_sender_id,\n" +
             "        u.name as latest_message_sender_name,\n" +
@@ -152,6 +157,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
             "    profile_pic,\n" +
             "    type,\n" +
             "    latest_message,\n" +
+            "    latest_message_id,\n" +
             "    latest_message_type,\n" +
             "    latest_message_sender_id,\n" +
             "    latest_message_sender_name,\n" +

@@ -192,7 +192,7 @@ public class MessageService {
             BufferedImage bufferedImage = AWTUtil.toBufferedImage(picture);
             try {
                 Thumbnails.of(bufferedImage)
-                        .scale(0.2)
+                        .scale(0.5)
                         .toFile(thumbPath+".png");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -212,7 +212,7 @@ public class MessageService {
         Path thumbPath = Paths.get(thumbDirectoryPath, fileName);
         try {
             Thumbnails.of(file)
-                    .scale(0.2)
+                    .scale(0.5)
                     .toFile(thumbPath.toString());
         } catch (IOException e) {
             e.printStackTrace();
@@ -230,7 +230,6 @@ public class MessageService {
                         byte[] fileBytes = viewFile(originalMessage.getContent(),"user_"+originalMessage.getSender().getId(),originalMessage.getType().toString());
                         MultipartFile multipartFile = new BASE64DecodedMultipartFile(fileBytes,extractFileName(originalMessage.getContent()));
                         originalMessageText = uploadFile(multipartFile,currentUser.getId(),originalMessage.getType());
-//                        originalMessage.setContent(newContent);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

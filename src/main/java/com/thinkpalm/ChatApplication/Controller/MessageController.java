@@ -109,6 +109,11 @@ public class MessageController {
         MediaType mediaType = determineContentType(filename);
         return ResponseEntity.ok().contentType(mediaType).body(messageService.viewFile(filename,name,"video"));
     }
+    @GetMapping("/view/{name}/audio/{filename}")
+    public ResponseEntity<byte[]> viewAudio(@PathVariable String filename, @PathVariable String name) throws IOException {
+        MediaType mediaType = determineContentType(filename);
+        return ResponseEntity.ok().contentType(mediaType).body(messageService.viewFile(filename,name,"audio"));
+    }
     @GetMapping("/view/{name}/thumbnail/{filename}")
     public ResponseEntity<byte[]> viewthumbnail(@PathVariable String filename, @PathVariable String name) throws IOException {
         MediaType mediaType = determineContentType(filename);
@@ -147,6 +152,12 @@ public class MessageController {
             return MediaType.APPLICATION_PDF;
         } else if (filename.endsWith(".mp4") || filename.endsWith(".avi")) {
             return MediaType.valueOf("video/mp4");
+        }  else if (filename.endsWith(".mp3")) {
+            return MediaType.valueOf("audio/mp3");
+        } else if (filename.endsWith(".wav")) {
+            return MediaType.valueOf("audio/wav");
+        } else if (filename.endsWith(".ogg")) {
+            return MediaType.valueOf("audio/ogg");
         } else {
             return MediaType.APPLICATION_OCTET_STREAM;
         }

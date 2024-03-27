@@ -304,26 +304,11 @@ public class MessageService {
         return response;
     }
 
-//    public List<Map<String,Object>> getUserChatMessages(Integer otherUserId){
-//        UserModel otherUserData = userRepository.findById(otherUserId).orElse(null);
-//        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
-//        if(otherUserData != null){
-//            List<Map<String,Object>> messages = messageReceiverRepository.getAllUserChatMessages(currentUser.getId(), otherUserData.getId());
-//            return messages;
-//        }
-//        else{
-//            throw new UserNotFoundException("No user with Id : "+otherUserId);
-//        }
-//    }
-
-    public List<Map<String,Object>> getPaginatedUserChatMessages(Integer otherUserId, Integer pageNumber){
+    public List<Map<String,Object>> getUserChatMessages(Integer otherUserId){
         UserModel otherUserData = userRepository.findById(otherUserId).orElse(null);
         UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         if(otherUserData != null){
-            Pageable pageable = PageRequest.of(pageNumber,20);
-            Page<Map<String, Object>> page = messageReceiverRepository.getAllPaginatedUserChatMessages(currentUser.getId(), otherUserData.getId(),pageable);
-            List<Map<String,Object>> messages = new ArrayList<>(page.getContent());
-            Collections.reverse(messages);
+            List<Map<String,Object>> messages = messageReceiverRepository.getAllUserChatMessages(currentUser.getId(), otherUserData.getId());
             return messages;
         }
         else{
@@ -331,15 +316,10 @@ public class MessageService {
         }
     }
 
-    public List<Map<String,Object>> getPaginatedRoomChatMessages(Integer roomId,Integer pageNumber) throws IllegalAccessException {
-        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
+    public List<Map<String,Object>> getRoomChatMessages(Integer roomId) throws IllegalAccessException {        UserModel currentUser = userRepository.findByName(AppContext.getUserName()).orElse(null);
         RoomModel roomData = roomRepository.findById(roomId).orElse(null);
         if(roomData != null){
-            Pageable pageable = PageRequest.of(pageNumber,20);
-            Page<Map<String, Object>> page = messageRoomRepository.getAllPaginatedRoomMessages(roomData.getId(),currentUser.getId(),pageable);
-            List<Map<String,Object>> messages = new ArrayList<>(page.getContent());
-            Collections.reverse(messages);
-            return messages;
+            return messageRoomRepository.getAllRoomMessages(roomData.getId(),currentUser.getId());
         }else {
             throw new RoomNotFoundException("Room not found!");
         }

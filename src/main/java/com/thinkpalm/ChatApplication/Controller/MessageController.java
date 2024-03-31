@@ -4,11 +4,13 @@ import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,13 +21,21 @@ import java.util.Map;
 @RestController
 @RequestMapping("/chatApi/v1/message")
 public class MessageController {
-
+    private final SimpMessagingTemplate messagingTemplate;
     private final MessageService messageService;
 
     @Autowired
-    public MessageController(MessageService messageService){
+    public MessageController(SimpMessagingTemplate messagingTemplate, MessageService messageService){
+        this.messagingTemplate = messagingTemplate;
         this.messageService = messageService;
     }
+
+//    @MessageMapping("/chat")
+//    public void processMessage(@Payload String chatId){
+//        messagingTemplate.convertAndSendToUser(
+//                chatId,"/queue/messages","new"
+//        );
+//    }
 
     @PostMapping("/sendMessage")
     public ResponseEntity<String> sendMessage(@RequestBody MessageSendRequest msg) throws IllegalAccessException {

@@ -60,7 +60,7 @@ public class SecurityConfigure {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth->auth
-                        .requestMatchers("/chatApi/v1/auth/**","/chatApi/v1/image/view/**","/chatApi/v1/message/view/**").permitAll()
+                        .requestMatchers("/chatApi/v1/auth/**","/chatApi/v1/image/view/**","/chatApi/v1/message/view/**","/ws/**").permitAll()
                         .anyRequest().authenticated()
                 ).httpBasic(Customizer.withDefaults())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

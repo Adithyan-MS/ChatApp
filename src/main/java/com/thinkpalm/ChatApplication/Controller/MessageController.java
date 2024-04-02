@@ -30,17 +30,18 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-//    @MessageMapping("/chat")
-//    public void processMessage(@Payload String chatId){
-//        messagingTemplate.convertAndSendToUser(
-//                chatId,"/queue/messages","new"
-//        );
-//    }
+    @MessageMapping("/chat")
+    public void processMessage(@Payload String username){
+        messagingTemplate.convertAndSendToUser(
+                username,"/queue/messages","new message"
+        );
+    }
 
     @PostMapping("/sendMessage")
     public ResponseEntity<String> sendMessage(@RequestBody MessageSendRequest msg) throws IllegalAccessException {
         return new ResponseEntity<>(messageService.sendMessage(msg),HttpStatus.OK);
     }
+
     @PostMapping("/sendFile")
     public ResponseEntity<String> sendFile(@RequestPart("file") MultipartFile file, @RequestPart("messageData") String messageSendRequestText) {
         return new ResponseEntity<>(messageService.sendFile(file,messageSendRequestText),HttpStatus.OK);
@@ -50,6 +51,7 @@ public class MessageController {
     public ResponseEntity<String> forwardMessage(@RequestBody MessageForwardRequest msg){
         return new ResponseEntity<>(messageService.forwardMessage(msg),HttpStatus.OK);
     }
+
     @PostMapping("/editMessage")
     public ResponseEntity<String> editMessage(@RequestBody EditRequest editRequest) throws IllegalAccessException {
         return new ResponseEntity<>(messageService.editMessage(editRequest),HttpStatus.OK);

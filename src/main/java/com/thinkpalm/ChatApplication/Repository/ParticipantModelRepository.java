@@ -43,6 +43,9 @@ public interface ParticipantModelRepository extends JpaRepository<ParticipantMod
             "  END, u.name",nativeQuery = true)
     List<Map<String, Object>> getRoomParticipants(Integer roomId);
 
+    @Query(value = "SELECT user_id FROM chatdb.participant as p where p.room_id = ?1 and p.is_active = true",nativeQuery = true)
+    List<Integer> getRoomParticipantIds(Integer roomId);
+
     @Query(value = "SELECT u.id, u.name, u.profile_pic, p.is_admin,p.left_at\n" +
             "FROM participant AS p\n" +
             "INNER JOIN user AS u ON p.user_id = u.id\n" +

@@ -13,17 +13,12 @@ import org.jcodec.common.model.Picture;
 import org.jcodec.scale.AWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,12 +42,13 @@ public class MessageService {
     private final MessageHistoryRepository messageHistoryRepository;
     private final DeletedMessageRepository deletedMessageRepository;
     private final StarredMessageRepository starredMessageRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Value("${spring.servlet.multipart.location}")
     private String uploadDirectory;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageReceiverRepository messageReceiverRepository, RoomRepository roomRepository, MessageRoomRepository messageRoomRepository, ParticipantModelRepository participantModelRepository, LikeRepository likeRepository, MessageHistoryRepository messageHistoryRepository, DeletedMessageRepository deletedMessageRepository, StarredMessageRepository starredMessageRepository){
+    public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageReceiverRepository messageReceiverRepository, RoomRepository roomRepository, MessageRoomRepository messageRoomRepository, ParticipantModelRepository participantModelRepository, LikeRepository likeRepository, MessageHistoryRepository messageHistoryRepository, DeletedMessageRepository deletedMessageRepository, StarredMessageRepository starredMessageRepository, SimpMessagingTemplate messagingTemplate){
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.messageReceiverRepository = messageReceiverRepository;
@@ -63,6 +59,7 @@ public class MessageService {
         this.messageHistoryRepository = messageHistoryRepository;
         this.deletedMessageRepository = deletedMessageRepository;
         this.starredMessageRepository = starredMessageRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public String sendMessage(MessageSendRequest messageSendRequest) throws IllegalAccessException {
@@ -418,4 +415,18 @@ public class MessageService {
         }
     }
 
+    public void processMessage(StompSendMessage stompSendMessage) {
+        if(stompSendMessage.getReceiverType() == ReceiverType.room){
+            List<Integer> participantIds = participantModelRepository.getRoomParticipantIds(stompSendMessage.getReceiverId());
+            participantIds.forEach(participantId->{
+                messagingTemplate.convertAndSendToUser(
+                        String.valueOf(participantId),"/queue/messages","new message"
+                );
+            });
+        }else{
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(stompSendMessage.getReceiverId()),"/queue/messages","new message"
+            );
+        }
+    }
 }

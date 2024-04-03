@@ -21,20 +21,16 @@ import java.util.Map;
 @RestController
 @RequestMapping("/chatApi/v1/message")
 public class MessageController {
-    private final SimpMessagingTemplate messagingTemplate;
     private final MessageService messageService;
 
     @Autowired
-    public MessageController(SimpMessagingTemplate messagingTemplate, MessageService messageService){
-        this.messagingTemplate = messagingTemplate;
+    public MessageController( MessageService messageService){
         this.messageService = messageService;
     }
 
     @MessageMapping("/chat")
-    public void processMessage(@Payload String username){
-        messagingTemplate.convertAndSendToUser(
-                username,"/queue/messages","new message"
-        );
+    public void processMessage(@Payload StompSendMessage stompSendMessage){
+        messageService.processMessage(stompSendMessage);
     }
 
     @PostMapping("/sendMessage")

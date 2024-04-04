@@ -420,12 +420,20 @@ public class MessageService {
             List<Integer> participantIds = participantModelRepository.getRoomParticipantIds(stompSendMessage.getReceiverId());
             participantIds.forEach(participantId->{
                 messagingTemplate.convertAndSendToUser(
-                        String.valueOf(participantId),"/queue/messages","new message"
+                        String.valueOf(participantId),"/queue/messages",ChatNotification
+                                .builder()
+                                .senderId(stompSendMessage.getSenderId())
+                                .senderType(ReceiverType.room)
+                                .build()
                 );
             });
         }else{
             messagingTemplate.convertAndSendToUser(
-                    String.valueOf(stompSendMessage.getReceiverId()),"/queue/messages","new message"
+                    String.valueOf(stompSendMessage.getReceiverId()),"/queue/messages",ChatNotification
+                            .builder()
+                            .senderId(stompSendMessage.getSenderId())
+                            .senderType(ReceiverType.user)
+                            .build()
             );
         }
     }

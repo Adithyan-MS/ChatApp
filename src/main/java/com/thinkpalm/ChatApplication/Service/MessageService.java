@@ -422,7 +422,7 @@ public class MessageService {
                 messagingTemplate.convertAndSendToUser(
                         String.valueOf(participantId),"/queue/messages",ChatNotification
                                 .builder()
-                                .senderId(stompSendMessage.getSenderId())
+                                .senderId(stompSendMessage.getReceiverId())
                                 .senderType(ReceiverType.room)
                                 .build()
                 );

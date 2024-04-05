@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
+
 public class ChatNotification {
     private ReceiverType senderType;
     private Integer senderId;

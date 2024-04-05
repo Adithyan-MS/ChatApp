@@ -51,6 +51,9 @@ public class UserModel extends Auditable{
     @Column
     private String profilePic;
 
+    @Column
+    private boolean isOnline = false;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Token> tokens;

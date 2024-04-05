@@ -6,6 +6,7 @@ import com.thinkpalm.ChatApplication.Model.*;
 import com.thinkpalm.ChatApplication.Repository.TokenRepository;
 import com.thinkpalm.ChatApplication.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,13 +25,16 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final SimpMessagingTemplate messagingTemplate;
+
     @Autowired
-    public AuthService(UserRepository userRepository, TokenRepository tokenRepository, JwtService jwtService, PasswordEncoder encoder, AuthenticationManager authenticationManager) {
+    public AuthService(UserRepository userRepository, TokenRepository tokenRepository, JwtService jwtService, PasswordEncoder encoder, AuthenticationManager authenticationManager, SimpMessagingTemplate messagingTemplate) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.jwtService = jwtService;
         this.encoder = encoder;
         this.authenticationManager = authenticationManager;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public Object registerUser(UserModel user){
@@ -95,5 +99,27 @@ public class AuthService {
                 .expired(false)
                 .build();
         tokenRepository.save(token);
+    }
+
+    public void activateUser(Integer userId) {
+        UserModel user = userRepository.findById(userId).orElse(null);
+        if(user!=null){
+            user.setOnline(true);
+            userRepository.save(user);
+            messagingTemplate.convertAndSend("/topic/news",user.getName() + " is Online");
+        }else {
+            throw new UserNotFoundException("User Not Found!");
+        }
+    }
+
+    public void deactivateUser(Integer userId) {
+        UserModel user = userRepository.findById(userId).orElse(null);
+        if(user!=null){
+            user.setOnline(false);
+            userRepository.save(user);
+            messagingTemplate.convertAndSend("/topic/news",user.getName() + " is Offline");
+        }else{
+            throw new UserNotFoundException("User Not Found!");
+        }
     }
 }
